@@ -5,7 +5,7 @@ import { Column } from 'primereact/column';
 import { getProducts } from './ProductService';
 import { Toast } from 'primereact/toast';
 import { Button } from 'primereact/button';
-import { Rating } from 'primereact/rating';
+//import { Rating } from 'primereact/rating';
 import { InputTextarea } from 'primereact/inputtextarea';
 import { RadioButton, RadioButtonChangeParams } from 'primereact/radiobutton';
 import { InputNumber, InputNumberChangeParams } from 'primereact/inputnumber';
@@ -15,11 +15,22 @@ import 'primereact/resources/themes/saga-blue/theme.css';
 import 'primereact/resources/primereact.min.css';
 import 'primeicons/primeicons.css';
 import 'primeflex/primeflex.css';
+//import { groupCollapsed } from 'console';
 
 interface Product {
-    id?: string;
+    id?: string | number;
     name?: string;
-    image?: string;
+    firstName: string;
+    lastName: string;
+    middleName: string;
+    photoId?: string;
+    gender?: string;
+    dateOfBirth?: Date | string;
+    insurance?: boolean;
+    school?: string;
+    shift?: "FIRST" | "SECOND" | "";
+    groups?: {id: string | number, groupDescription: string}[]
+
     description?: string;
     category?: string;
     price?: number;
@@ -32,13 +43,23 @@ function App() {
     let emptyProduct: Product = {
         id: '',
         name: '',
-        image: '',
-        description: '',
+        firstName: '',
+        lastName: '',
+        middleName: '',
+        photoId: '',
+        dateOfBirth: '',
+        insurance: false,
+        school: '',
+        shift: '',
+        groups: []
+
+
+        /*description: '',
         category: '',
         price: 0,
         quantity: 0,
         rating: 0,
-        inventoryStatus: 'INSTOCK'
+        inventoryStatus: 'INSTOCK'*/
     };
 
     const [products, setProducts] = useState<Product[]>([]);
@@ -56,9 +77,9 @@ function App() {
         getProducts().then(data => setProducts(data));
     }, []);
 
-    const formatCurrency = (value: number) => {
+    /*const formatCurrency = (value: number) => {
         return value.toLocaleString('en-US', { style: 'currency', currency: 'USD' });
-    }
+    }*/
 
     const openNew = () => {
         setProduct(emptyProduct);
@@ -82,7 +103,7 @@ function App() {
     const saveProduct = () => {
         setSubmitted(true);
 
-        if (product.name?.trim()) {
+        if (product.firstName?.trim() &&product.lastName?.trim()) {
             let _products = [...products];
             let _product = {...product};
             if (product.id) {
@@ -93,7 +114,7 @@ function App() {
             }
             else {
                 _product.id = createId();
-                _product.image = 'product-placeholder.svg';
+                _product.photoId = 'avatar2.png';
                 _products.push(_product);
                 toast.current?.show({ severity: 'success', summary: 'Successful', detail: 'Product Created', life: 3000 });
             }
@@ -122,7 +143,7 @@ function App() {
         toast.current?.show({ severity: 'success', summary: 'Successful', detail: 'Product Deleted', life: 3000 });
     }
 
-    const findIndexById = (id: string) => {
+    const findIndexById = (id: string | number) => {
         let index = -1;
         for (let i = 0; i < products.length; i++) {
             if (products[i].id === id) {
@@ -159,16 +180,16 @@ function App() {
         toast.current?.show({ severity: 'success', summary: 'Successful', detail: 'Products Deleted', life: 3000 });
     }
 
-    const onCategoryChange = (e: RadioButtonChangeParams) => {
+    const onGenderSet = (e: RadioButtonChangeParams) => {
         let _product = {...product};
-        _product['category'] = e.value;
+        _product['gender'] = e.value;
         setProduct(_product);
     }
 
     const onNameChange = (e: ChangeEvent<HTMLInputElement>) => {
         const val = (e.target && e.target.value) || '';
         let _product: Product = {...product};
-        _product.name = val;
+        _product.firstName = val;
 
         setProduct(_product);
     }
@@ -198,10 +219,59 @@ function App() {
     }
 
     const imageBodyTemplate = (rowData: Product) => {
-        return <img src={`demo/images/product/${rowData.image}`} alt={rowData.image} className="w-7rem shadow-2" />
+        if(rowData.photoId && rowData.photoId!==null) {
+            return <img src={`demo/images/product/${rowData.photoId}`} alt={rowData.photoId} className="w-7rem shadow-2" />
+        } else {
+            return <img src='demo/images/product/avatar2.png' alt='default avatar' className="w-7rem shadow-2" />
+        }        
     }
 
-    const priceBodyTemplate = (rowData: Product) => {
+    const nameBodyTemplate = (rowData: Product) => {
+        if(rowData.firstName && rowData.lastName && rowData.middleName) {
+            return <span> {`${rowData.lastName} ${rowData.firstName} ${rowData.middleName}`} </span>
+        }  
+    }
+
+    const addZero = (num: number) => {
+        if (num < 10) {
+            return '0' + num 
+        }
+         return num        
+    }
+
+    const dateBodyTemplate = (rowData: Product) => {
+        if (rowData.dateOfBirth) {            
+            let date: Date = new Date(rowData.dateOfBirth)
+            let dateArr = [addZero(date.getDate()), addZero(date.getMonth()+1), date.getFullYear()]
+            return <span> {`${dateArr[0]}.${dateArr[1]}.${dateArr[2]}`} </span>
+        } 
+    }
+
+    const shiftBodyTemplate = (rowData: Product) => {
+        if(rowData.shift && rowData.shift === "FIRST") {
+            return <span>1</span>
+        } else if (rowData.shift && rowData.shift === "SECOND") {
+            return <span>2</span>
+        }        
+    }
+    
+    
+    const groupBodyTemplate = (rowData: Product) => {        
+        if(rowData.groups) {            
+            return <div> {
+                rowData.groups.map((group) =>  `${group.groupDescription} `)
+            } </div>                        
+        }  
+    }
+
+    const genderBodyTemplate = (rowData: Product) => {
+        if (rowData.gender) {
+            let text = rowData.gender
+            return <span> {text[0] + text.slice(1).toLowerCase()} </span>
+        } 
+    }
+
+    /*const priceBodyTemplate = (rowData: Product) => {
         return (rowData.price !== undefined) ? formatCurrency(rowData.price): '';
     }
 
@@ -211,7 +281,7 @@ function App() {
 
     const statusBodyTemplate = (rowData: Product) => {
         return <span className={`product-badge status-${rowData.inventoryStatus?.toLowerCase()}`}>{rowData.inventoryStatus}</span>;
-    }
+    }*/
 
     const actionBodyTemplate = (rowData: Product) => {
         return (
@@ -268,22 +338,28 @@ function App() {
                 currentPageReportTemplate="Showing {first} to {last} of {totalRecords} products"
                 globalFilter={globalFilter} header={header} responsiveLayout="scroll">
                 <Column selectionMode="multiple" headerStyle={{ width: '3rem' }} exportable={false}></Column>
-                <Column field="code" header="Code" sortable style={{ minWidth: '12rem' }}></Column>
-                <Column field="name" header="Name" sortable style={{ minWidth: '16rem' }}></Column>
-                <Column field="image" header="Image" body={imageBodyTemplate}></Column>
-                <Column field="price" header="Price" body={priceBodyTemplate} sortable style={{ minWidth: '8rem' }}></Column>
-                <Column field="category" header="Category" sortable style={{ minWidth: '10rem' }}></Column>
-                <Column field="rating" header="Reviews" body={ratingBodyTemplate} sortable style={{ minWidth: '12rem' }}></Column>
-                <Column field="inventoryStatus" header="Status" body={statusBodyTemplate} sortable style={{ minWidth: '12rem' }}></Column>
+                
+                <Column field="image" header="Photo" body={imageBodyTemplate}></Column>
+                <Column field="fullname" header="Name" body={nameBodyTemplate} sortable style={{ minWidth: '16rem' }}></Column>                
+                <Column field="dateOfBirth" header="Date Of Birth" body={dateBodyTemplate} sortable style={{ minWidth: '10rem' }}></Column> 
+                <Column field="shift" header="Shift" body={shiftBodyTemplate} sortable style={{ minWidth: '6rem' }}></Column> 
+                <Column field="groups" header="Groups" body={groupBodyTemplate} sortable style={{ minWidth: '16rem' }}></Column>              
+                <Column field="gender" header="Gender" body={genderBodyTemplate} sortable style={{ minWidth: '8rem' }}></Column>
+                
+                
                 <Column body={actionBodyTemplate} exportable={false} style={{ minWidth: '8rem' }}></Column>
             </DataTable>
 
             <Dialog visible={productDialog} breakpoints={{'960px': '75vw', '640px': '100vw'}} style={{width: '40vw'}} header="Product Details" modal className="p-fluid" footer={productDialogFooter} onHide={hideDialog}>
-                {product.image && <img src={`demo/images/product/${product.image}`} alt={product.image} className="block mt-0 mx-auto mb-5 w-20rem shadow-2" />}
+                {product.photoId && <img 
+                    src={`demo/images/product/${product.photoId}`} 
+                    alt={product.photoId} 
+                    className="block mt-0 mx-auto mb-5 w-20rem shadow-2" 
+                />}
                 <div className="field">
                     <label htmlFor="name">Name</label>
-                    <InputText id="name" value={product.name} onChange={(e) => onNameChange(e)} required autoFocus className={classNames({ 'p-invalid': submitted && !product.name })} />
-                    {submitted && !product.name && <small className="p-error">Name is required.</small>}
+                    <InputText id="name" value={product.firstName} onChange={(e) => onNameChange(e)} required autoFocus className={classNames({ 'p-invalid': submitted && !product.firstName })} />
+                    {submitted && !product.firstName && <small className="p-error">Name is required.</small>}
                 </div>
                 <div className="field">
                     <label htmlFor="description">Description</label>
@@ -291,24 +367,17 @@ function App() {
                 </div>
 
                 <div className="field">
-                    <label className="mb-3">Category</label>
+                    <label className="mb-3">Gender</label>
                     <div className="formgrid grid">
                         <div className="field-radiobutton col-6">
-                            <RadioButton inputId="category1" name="category" value="Accessories" onChange={onCategoryChange} checked={product.category === 'Accessories'} />
-                            <label htmlFor="category1">Accessories</label>
+                            <RadioButton inputId="category1" name="category" value="Accessories" onChange={onGenderSet} checked={product.gender === 'FEMALE'} />
+                            <label htmlFor="gender1">Female</label>
                         </div>
                         <div className="field-radiobutton col-6">
-                            <RadioButton inputId="category2" name="category" value="Clothing" onChange={onCategoryChange} checked={product.category === 'Clothing'} />
-                            <label htmlFor="category2">Clothing</label>
+                            <RadioButton inputId="category2" name="category" value="Clothing" onChange={onGenderSet} checked={product.gender === 'MALE'} />
+                            <label htmlFor="gender2">Male</label>
                         </div>
-                        <div className="field-radiobutton col-6">
-                            <RadioButton inputId="category3" name="category" value="Electronics" onChange={onCategoryChange} checked={product.category === 'Electronics'} />
-                            <label htmlFor="category3">Electronics</label>
-                        </div>
-                        <div className="field-radiobutton col-6">
-                            <RadioButton inputId="category4" name="category" value="Fitness" onChange={onCategoryChange} checked={product.category === 'Fitness'} />
-                            <label htmlFor="category4">Fitness</label>
-                        </div>
+                        
                     </div>
                 </div>
 
@@ -327,7 +396,7 @@ function App() {
             <Dialog visible={deleteProductDialog} style={{ width: '450px' }} header="Confirm" modal footer={deleteProductDialogFooter} onHide={hideDeleteProductDialog}>
                 <div className="flex align-items-center justify-content-center">
                     <i className="pi pi-exclamation-triangle mr-3" style={{ fontSize: '2rem'}} />
-                    {product && <span>Are you sure you want to delete <b>{product.name}</b>?</span>}
+                    {product && <span>Are you sure you want to delete <b>{product.firstName + product.lastName}</b>?</span>}
                 </div>
             </Dialog>
 
