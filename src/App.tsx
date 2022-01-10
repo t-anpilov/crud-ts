@@ -6,11 +6,13 @@ import { getProducts } from './ProductService';
 import { Toast } from 'primereact/toast';
 import { Button } from 'primereact/button';
 //import { Rating } from 'primereact/rating';
-import { InputTextarea } from 'primereact/inputtextarea';
+//import { InputTextarea } from 'primereact/inputtextarea';
 import { RadioButton, RadioButtonChangeParams } from 'primereact/radiobutton';
 import { InputNumber, InputNumberChangeParams } from 'primereact/inputnumber';
 import { Dialog } from 'primereact/dialog';
 import { InputText } from 'primereact/inputtext';
+import { Calendar, CalendarChangeParams } from 'primereact/calendar'
+import { Dropdown, DropdownChangeParams } from 'primereact/dropdown'
 import 'primereact/resources/themes/saga-blue/theme.css';
 import 'primereact/resources/primereact.min.css';
 import 'primeicons/primeicons.css';
@@ -19,30 +21,23 @@ import 'primeflex/primeflex.css';
 
 interface Product {
     id?: string | number;
-    name?: string;
     firstName: string;
     lastName: string;
     middleName: string;
-    photoId?: string;
+    photoId?: string | null;
     gender?: string;
-    dateOfBirth?: Date | string;
+    dateOfBirth?: Date | '' | Date[];
     insurance?: boolean;
     school?: string;
-    shift?: "FIRST" | "SECOND" | "";
+    shift?: Shifts;
     groups?: {id: string | number, groupDescription: string}[]
-
-    description?: string;
-    category?: string;
-    price?: number;
-    quantity?: number;
-    rating?: number;
-    inventoryStatus?: string;
 }
+
+type Shifts = "FIRST" | "SECOND" | ""
 
 function App() {
     let emptyProduct: Product = {
         id: '',
-        name: '',
         firstName: '',
         lastName: '',
         middleName: '',
@@ -53,13 +48,6 @@ function App() {
         shift: '',
         groups: []
 
-
-        /*description: '',
-        category: '',
-        price: 0,
-        quantity: 0,
-        rating: 0,
-        inventoryStatus: 'INSTOCK'*/
     };
 
     const [products, setProducts] = useState<Product[]>([]);
@@ -186,34 +174,33 @@ function App() {
         setProduct(_product);
     }
 
-    const onNameChange = (e: ChangeEvent<HTMLInputElement>) => {
+    const onNameChange = (e: ChangeEvent<HTMLInputElement>, prop: 'firstName'|'lastName'|'middleName') => {
         const val = (e.target && e.target.value) || '';
         let _product: Product = {...product};
-        _product.firstName = val;
-
+        if (prop === 'firstName') {
+            _product.firstName = val;
+        } else if (prop === 'lastName') {
+            _product.lastName = val;
+        } else if (prop === 'middleName') {
+            _product.middleName = val;
+        }    
         setProduct(_product);
     }
+    
 
-    const onDescriptionChange = (e: ChangeEvent<HTMLTextAreaElement>) => {
+    const onDateChange = (e: CalendarChangeParams) => {
         const val = (e.target && e.target.value) || '';
-        let _product: Product = {...product};
-        _product.description = val;
-
+        let _product = {...product};
+        _product.dateOfBirth = val;
         setProduct(_product);
     }
 
-    const onPriceChange = (e: InputNumberChangeParams) => {
-        const val = e.value || 0;
-        let _product = {...product};
-        _product.price = val;
+    const ShiftOptions: Shifts[] = ["FIRST", "SECOND"]
 
-        setProduct(_product);
-    }
-
-    const onQuantityChange = (e: InputNumberChangeParams) => {
-        const val = e.value || 0;
-        let _product = {...product};
-        _product.quantity = val;
+    const onShiftChange = (e: DropdownChangeParams) => {
+        const val = (e.target && e.target.value) || '';
+        let _product = {...product};        
+        _product.shift = val;        
 
         setProduct(_product);
     }
@@ -240,7 +227,7 @@ function App() {
     }
 
     const dateBodyTemplate = (rowData: Product) => {
-        if (rowData.dateOfBirth) {            
+        if (rowData.dateOfBirth && !Array.isArray(rowData.dateOfBirth)) {            
             let date: Date = new Date(rowData.dateOfBirth)
             let dateArr = [addZero(date.getDate()), addZero(date.getMonth()+1), date.getFullYear()]
             return <span> {`${dateArr[0]}.${dateArr[1]}.${dateArr[2]}`} </span>
@@ -354,41 +341,56 @@ function App() {
                 {product.photoId && <img 
                     src={`demo/images/product/${product.photoId}`} 
                     alt={product.photoId} 
-                    className="block mt-0 mx-auto mb-5 w-20rem shadow-2" 
+                    className="block mt-0 mx-auto mb-5 w-15rem shadow-2" 
+                />}
+                {product.photoId===null && <img 
+                    src='demo/images/product/avatar2.png' 
+                    alt='noPhoto'
+                    className="block mt-0 mx-auto mb-5 w-15rem shadow-2" 
                 />}
                 <div className="field">
-                    <label htmlFor="name">Name</label>
-                    <InputText id="name" value={product.firstName} onChange={(e) => onNameChange(e)} required autoFocus className={classNames({ 'p-invalid': submitted && !product.firstName })} />
+                    <label htmlFor="firstName">First Name</label>
+                    <InputText id="firstName" value={product.firstName} onChange={(e) => onNameChange(e, 'firstName')} required autoFocus className={classNames({ 'p-invalid': submitted && !product.firstName })} />
                     {submitted && !product.firstName && <small className="p-error">Name is required.</small>}
                 </div>
                 <div className="field">
-                    <label htmlFor="description">Description</label>
-                    <InputTextarea id="description" value={product.description} onChange={(e) => onDescriptionChange(e)} required rows={3} cols={20} />
+                    <label htmlFor="middleName">Middle Name</label>
+                    <InputText id="middleName" value={product.middleName} onChange={(e) => onNameChange(e, 'middleName')} required autoFocus className={classNames({ 'p-invalid': submitted && !product.middleName })} />
+                    {submitted && !product.middleName && <small className="p-error">Name is required.</small>}
+                </div>
+                <div className="field">
+                    <label htmlFor="lastName">Middle Name</label>
+                    <InputText id="lastName" value={product.lastName} onChange={(e) => onNameChange(e, 'lastName')} required autoFocus className={classNames({ 'p-invalid': submitted && !product.lastName })} />
+                    {submitted && !product.lastName && <small className="p-error">Name is required.</small>}
                 </div>
 
                 <div className="field">
                     <label className="mb-3">Gender</label>
                     <div className="formgrid grid">
                         <div className="field-radiobutton col-6">
-                            <RadioButton inputId="category1" name="category" value="Accessories" onChange={onGenderSet} checked={product.gender === 'FEMALE'} />
+                            <RadioButton inputId="gender1" name="gender" value="Female" onChange={onGenderSet} checked={product.gender === 'FEMALE'} />
                             <label htmlFor="gender1">Female</label>
                         </div>
                         <div className="field-radiobutton col-6">
-                            <RadioButton inputId="category2" name="category" value="Clothing" onChange={onGenderSet} checked={product.gender === 'MALE'} />
+                            <RadioButton inputId="gender2" name="gender" value="Male" onChange={onGenderSet} checked={product.gender === 'MALE'} />
                             <label htmlFor="gender2">Male</label>
-                        </div>
-                        
+                        </div>                        
                     </div>
                 </div>
 
                 <div className="formgrid grid">
                     <div className="field col">
-                        <label htmlFor="price">Price</label>
-                        <InputNumber id="price" value={product.price} onValueChange={(e) => onPriceChange(e)} mode="currency" currency="USD" locale="en-US" />
+                        <label htmlFor="date">Date Of Birth</label>
+                        <Calendar id="date" dateFormat="yy-mm-dd" onChange={(e) => onDateChange(e)} />
                     </div>
+                    
                     <div className="field col">
-                        <label htmlFor="quantity">Quantity</label>
-                        <InputNumber id="quantity" value={product.quantity} onValueChange={(e) => onQuantityChange(e)} />
+                        <label htmlFor="shift2">Shift</label>
+                        <Dropdown 
+                            id="shift2"                             
+                            options={ShiftOptions}  
+                            onChange={(e) => onShiftChange(e)}
+                            placeholder='Select a shift' />
                     </div>
                 </div>
             </Dialog>
