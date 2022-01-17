@@ -26,14 +26,16 @@ interface Product {
     middleName: string;
     photoId?: string | null;
     gender?: string;
-    dateOfBirth?: Date | '' | Date[];
+    dateOfBirth?: Date | Date[];
     insurance?: boolean;
     school?: string;
     shift?: Shifts;
-    groups?: {id: string | number, groupDescription: string}[]
+    groups?: Group[]
 }
 
+type Group = {id: string | number, groupDescription: string}
 type Shifts = "FIRST" | "SECOND" | ""
+enum Groups {"Старша хлопці", "Молодша дівчата"}
 
 function App() {
     let emptyProduct: Product = {
@@ -42,7 +44,6 @@ function App() {
         lastName: '',
         middleName: '',
         photoId: '',
-        dateOfBirth: '',
         insurance: false,
         school: '',
         shift: '',
@@ -54,6 +55,8 @@ function App() {
     const [productDialog, setProductDialog] = useState(false);
     const [deleteProductDialog, setDeleteProductDialog] = useState(false);
     const [deleteProductsDialog, setDeleteProductsDialog] = useState(false);
+    const [studentDetails, showStudentDetails] = useState(false); // as a variant
+    const [noEditMode, setEditMode] = useState(true);
     const [product, setProduct] = useState<Product>(emptyProduct);
     const [selectedProducts, setSelectedProducts] = useState<Product[]>([]);
     const [submitted, setSubmitted] = useState(false);
@@ -64,21 +67,23 @@ function App() {
     useEffect(() => {
         getProducts().then(data => setProducts(data));
     }, []);
-
-    /*const formatCurrency = (value: number) => {
-        return value.toLocaleString('en-US', { style: 'currency', currency: 'USD' });
-    }*/
-
+    
     const openNew = () => {
         setProduct(emptyProduct);
         setSubmitted(false);
         setProductDialog(true);
+        showStudentDetails(true);
     }
 
     const hideDialog = () => {
         setSubmitted(false);
         setProductDialog(false);
+        showStudentDetails(false);
     }
+
+    const allowEdit = () => {
+        setEditMode(false)
+    }   
 
     const hideDeleteProductDialog = () => {
         setDeleteProductDialog(false);
@@ -98,13 +103,13 @@ function App() {
                 const index = findIndexById(product.id);
 
                 _products[index] = _product;
-                toast.current?.show({ severity: 'success', summary: 'Successful', detail: 'Product Updated', life: 3000 });
+                toast.current?.show({ severity: 'success', summary: 'Successful', detail: 'Student\'s Data Updated', life: 3000 });
             }
             else {
                 _product.id = createId();
                 _product.photoId = 'avatar2.png';
                 _products.push(_product);
-                toast.current?.show({ severity: 'success', summary: 'Successful', detail: 'Product Created', life: 3000 });
+                toast.current?.show({ severity: 'success', summary: 'Successful', detail: 'Student\'s Profile Updated', life: 3000 });
             }
 
             setProducts(_products);
@@ -112,6 +117,11 @@ function App() {
             setProduct(emptyProduct);
         }
     }
+
+    const showDetails = (product: Product) => {
+        showStudentDetails(true);  
+        setProduct({...product}); 
+    }    
 
     const editProduct = (product: Product) => {
         setProduct({...product});
@@ -128,7 +138,7 @@ function App() {
         setProducts(_products);
         setDeleteProductDialog(false);
         setProduct(emptyProduct);
-        toast.current?.show({ severity: 'success', summary: 'Successful', detail: 'Product Deleted', life: 3000 });
+        toast.current?.show({ severity: 'success', summary: 'Successful', detail: 'Student Removed', life: 3000 });
     }
 
     const findIndexById = (id: string | number) => {
@@ -185,31 +195,72 @@ function App() {
             _product.middleName = val;
         }    
         setProduct(_product);
-    }
+    } 
     
+    const getNumber = (str: string):number => {
+        let num: number = 0
+        for (let i=0; i<str.length; i++) {
+            if(!isNaN(Number(str[i]))) {
+               num = i  
+               break              
+            }
+        }
+        return parseInt( str.slice(num) )   
+    } 
+    
+    const onSchoolChange = (e: InputNumberChangeParams) => {
+        const val = e && e.value;
+        let _product = {...product};
+        _product.school =  '#' + val;
+        setProduct(_product);
+    }
 
     const onDateChange = (e: CalendarChangeParams) => {
-        const val = (e.target && e.target.value) || '';
-        let _product = {...product};
-        _product.dateOfBirth = val;
-        setProduct(_product);
+        if (e.target.value!==null)   {
+            const val = (e.target && e.target.value);
+            let _product = {...product};
+            _product.dateOfBirth = val;
+            setProduct(_product);
+        }  
     }
 
     const ShiftOptions: Shifts[] = ["FIRST", "SECOND"]
 
     const onShiftChange = (e: DropdownChangeParams) => {
-        const val = (e.target && e.target.value) || '';
+        const val = e.target && e.target.value;
         let _product = {...product};        
-        _product.shift = val;        
+        _product.shift = val;   
+        setProduct(_product);        
+    }
 
+    const GroupsOptions = Object.keys(Groups).filter(k => typeof Groups[k as any] === "number")
+
+    const showGroup = (data: Group[]) => {
+        let result: string[] = []
+        data.forEach((group) => result.push(group.groupDescription))        
+        return result.join(', ')
+    }
+
+    const onGroupsChange = (e: DropdownChangeParams) => {
+        const val = e.target && e.target.value;
+        let _product = {...product};        
+        if (_product.groups) {
+            _product.groups.push({id: 1000, groupDescription: val});
+            setProduct(_product); 
+        }  
+    }
+
+    const onInsuranceChange = (e: RadioButtonChangeParams) => {
+        let _product = {...product};
+        _product['insurance'] = e.value;
         setProduct(_product);
     }
 
     const imageBodyTemplate = (rowData: Product) => {
         if(rowData.photoId && rowData.photoId!==null) {
-            return <img src={`demo/images/product/${rowData.photoId}`} alt={rowData.photoId} className="w-7rem shadow-2" />
+            return <img src={`demo/images/product/${rowData.photoId}`} alt={rowData.photoId} className="w-5rem shadow-2" />
         } else {
-            return <img src='demo/images/product/avatar2.png' alt='default avatar' className="w-7rem shadow-2" />
+            return <img src='demo/images/product/avatar2.png' alt='default avatar' className="w-5rem shadow-2" />
         }        
     }
 
@@ -292,8 +343,10 @@ function App() {
             </div>
         </div>
     );
+    
     const productDialogFooter = (
         <React.Fragment>
+            <Button label="Edit" icon="pi pi-check" onClick={allowEdit} />
             <Button label="Cancel" icon="pi pi-times" className="p-button-text" onClick={hideDialog} />
             <Button label="Save" icon="pi pi-check" onClick={saveProduct} />
         </React.Fragment>
@@ -317,97 +370,162 @@ function App() {
         <div className="datatable-crud-demo surface-card p-4 border-round shadow-2">
             <Toast ref={toast} />
 
-            <div className="text-3xl text-800 font-bold mb-4">PrimeReact CRUD</div>
+            <div className="text-3xl text-800 font-bold mb-4">STUDENTS</div>
 
             <DataTable ref={dt} value={products} selection={selectedProducts} onSelectionChange={(e) => setSelectedProducts(e.value)}
                 dataKey="id" paginator rows={10} rowsPerPageOptions={[5, 10, 25]}
                 paginatorTemplate="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink CurrentPageReport RowsPerPageDropdown"
                 currentPageReportTemplate="Showing {first} to {last} of {totalRecords} products"
-                globalFilter={globalFilter} header={header} responsiveLayout="scroll">
+                globalFilter={globalFilter} header={header} responsiveLayout="scroll"
+                onRowDoubleClick={(e)=>showDetails(e.data)}>
                 <Column selectionMode="multiple" headerStyle={{ width: '3rem' }} exportable={false}></Column>
                 
                 <Column field="image" header="Photo" body={imageBodyTemplate}></Column>
-                <Column field="fullname" header="Name" body={nameBodyTemplate} sortable style={{ minWidth: '16rem' }}></Column>                
+                <Column field="fullname" sortField="lastName" header="Name" body={nameBodyTemplate} sortable style={{ minWidth: '16rem' }}></Column>                
                 <Column field="dateOfBirth" header="Date Of Birth" body={dateBodyTemplate} sortable style={{ minWidth: '10rem' }}></Column> 
                 <Column field="shift" header="Shift" body={shiftBodyTemplate} sortable style={{ minWidth: '6rem' }}></Column> 
                 <Column field="groups" header="Groups" body={groupBodyTemplate} sortable style={{ minWidth: '16rem' }}></Column>              
                 <Column field="gender" header="Gender" body={genderBodyTemplate} sortable style={{ minWidth: '8rem' }}></Column>
-                
-                
+                                
                 <Column body={actionBodyTemplate} exportable={false} style={{ minWidth: '8rem' }}></Column>
             </DataTable>
 
-            <Dialog visible={productDialog} breakpoints={{'960px': '75vw', '640px': '100vw'}} style={{width: '40vw'}} header="Product Details" modal className="p-fluid" footer={productDialogFooter} onHide={hideDialog}>
+            <Dialog visible={productDialog} breakpoints={{'960px': '75vw', '640px': '100vw'}} style={{width: '40vw'}} header="Student Profile" modal className="p-fluid" footer={productDialogFooter} onHide={hideDialog}>
                 {product.photoId && <img 
                     src={`demo/images/product/${product.photoId}`} 
                     alt={product.photoId} 
-                    className="block mt-0 mx-auto mb-5 w-15rem shadow-2" 
+                    className="block mt-0 mx-auto mb-5 w-12rem shadow-2" 
                 />}
                 {product.photoId===null && <img 
                     src='demo/images/product/avatar2.png' 
                     alt='noPhoto'
-                    className="block mt-0 mx-auto mb-5 w-15rem shadow-2" 
+                    className="block mt-0 mx-auto mb-5 w-12rem shadow-2" 
                 />}
                 <div className="field">
                     <label htmlFor="firstName">First Name</label>
-                    <InputText id="firstName" value={product.firstName} onChange={(e) => onNameChange(e, 'firstName')} required autoFocus className={classNames({ 'p-invalid': submitted && !product.firstName })} />
+                    <InputText id="firstName" disabled={noEditMode} value={product.firstName} onChange={(e) => onNameChange(e, 'firstName')} required className={classNames({ 'p-invalid': submitted && !product.firstName })} />
                     {submitted && !product.firstName && <small className="p-error">Name is required.</small>}
                 </div>
                 <div className="field">
                     <label htmlFor="middleName">Middle Name</label>
-                    <InputText id="middleName" value={product.middleName} onChange={(e) => onNameChange(e, 'middleName')} required autoFocus className={classNames({ 'p-invalid': submitted && !product.middleName })} />
+                    <InputText id="middleName" value={product.middleName} onChange={(e) => onNameChange(e, 'middleName')} required className={classNames({ 'p-invalid': submitted && !product.middleName })} />
                     {submitted && !product.middleName && <small className="p-error">Name is required.</small>}
                 </div>
                 <div className="field">
                     <label htmlFor="lastName">Middle Name</label>
-                    <InputText id="lastName" value={product.lastName} onChange={(e) => onNameChange(e, 'lastName')} required autoFocus className={classNames({ 'p-invalid': submitted && !product.lastName })} />
+                    <InputText id="lastName" value={product.lastName} onChange={(e) => onNameChange(e, 'lastName')} required className={classNames({ 'p-invalid': submitted && !product.lastName })} />
                     {submitted && !product.lastName && <small className="p-error">Name is required.</small>}
                 </div>
 
-                <div className="field">
-                    <label className="mb-3">Gender</label>
-                    <div className="formgrid grid">
-                        <div className="field-radiobutton col-6">
-                            <RadioButton inputId="gender1" name="gender" value="Female" onChange={onGenderSet} checked={product.gender === 'FEMALE'} />
+                <div className="formgrid grid">
+                    <div className="field col-6" >
+                        <label htmlFor="date">Date Of Birth</label>
+                        <Calendar 
+                            id="date" 
+                            className=""
+                            value={product.dateOfBirth ? new Date(product.dateOfBirth.toString()) : undefined} 
+                            dateFormat="dd.mm.yy" 
+                            monthNavigator yearNavigator yearRange="1980:2025"
+                            onChange={(e) => onDateChange(e)} />
+                    </div> 
+                    <div className="field col">
+                        <label className="mb-3">Gender</label>
+                        <div className="field-radiobutton col-4">
+                            <RadioButton inputId="gender1" name="gender" value="Female" onChange={onGenderSet} checked={product.gender === 'FEMALE'}  />
                             <label htmlFor="gender1">Female</label>
                         </div>
-                        <div className="field-radiobutton col-6">
+                        <div className="field-radiobutton col-4">
                             <RadioButton inputId="gender2" name="gender" value="Male" onChange={onGenderSet} checked={product.gender === 'MALE'} />
                             <label htmlFor="gender2">Male</label>
                         </div>                        
                     </div>
-                </div>
-
-                <div className="formgrid grid">
                     <div className="field col">
-                        <label htmlFor="date">Date Of Birth</label>
-                        <Calendar id="date" dateFormat="yy-mm-dd" onChange={(e) => onDateChange(e)} />
+                    <label className="mb-3">Insurance</label>
+                        <div className="field-radiobutton col-6">
+                            <RadioButton inputId="insurance1" name="insurance" onChange={onInsuranceChange} checked={product.insurance === true} />
+                            <label htmlFor="insurance1">Yes</label>
+                        </div>
+                        <div className="field-radiobutton col-6">
+                            <RadioButton inputId="insurance2" name="insurance" onChange={onInsuranceChange} checked={product.insurance === false} />
+                            <label htmlFor="insurance2">No</label>
+                        </div>                        
                     </div>
+                </div>                
+                                       
+                
+                <div className="formgrid grid">  
+                    <div className="field col">
+                        <label htmlFor="school">School</label>
+                        <InputNumber id="school" value={getNumber(product.school!)} onChange={(e) => onSchoolChange(e)} required className={classNames({ 'p-invalid': submitted && !product.school })} />
+                        {submitted && !product.lastName && <small className="p-error">Number is required.</small>}
+                    </div>                   
                     
                     <div className="field col">
-                        <label htmlFor="shift2">Shift</label>
+                        <label htmlFor="shift">Shift</label>
                         <Dropdown 
-                            id="shift2"                             
+                            id="shift" 
+                            value={product.shift}                                                                     
                             options={ShiftOptions}  
                             onChange={(e) => onShiftChange(e)}
                             placeholder='Select a shift' />
-                    </div>
+                    </div> 
+                </div>
+                <div className="field">
+                    <label htmlFor="group">Group</label>
+                    <Dropdown 
+                        id="group" 
+                        value={product.groups? showGroup(product.groups) : ''}                                                   
+                        options={GroupsOptions}  
+                        onChange={(e) => onGroupsChange(e)}
+                        placeholder='Select a group' />
                 </div>
             </Dialog>
 
             <Dialog visible={deleteProductDialog} style={{ width: '450px' }} header="Confirm" modal footer={deleteProductDialogFooter} onHide={hideDeleteProductDialog}>
                 <div className="flex align-items-center justify-content-center">
                     <i className="pi pi-exclamation-triangle mr-3" style={{ fontSize: '2rem'}} />
-                    {product && <span>Are you sure you want to delete <b>{product.firstName + product.lastName}</b>?</span>}
+                    {product && <span>Are you sure you want to remove?<b>{product.firstName + product.lastName}</b>?</span>}
                 </div>
             </Dialog>
 
             <Dialog visible={deleteProductsDialog} style={{ width: '450px' }} header="Confirm" modal footer={deleteProductsDialogFooter} onHide={hideDeleteProductsDialog}>
                 <div className="flex align-items-center justify-content-center">
                     <i className="pi pi-exclamation-triangle mr-3" style={{ fontSize: '2rem'}} />
-                    {product && <span>Are you sure you want to delete the selected products?</span>}
+                    {product && <span>Are you sure you want to remove the selected students?</span>}
                 </div>
             </Dialog>
+
+            <Dialog 
+                visible={studentDetails} 
+                breakpoints={{'960px': '75vw', '800px': '100vw'}} 
+                style={{width: '40vw'}} header="Student Profile" 
+                modal className="p-fluid" 
+                onHide={hideDialog}>
+
+                {product.photoId && <img 
+                    src={`demo/images/product/${product.photoId}`} 
+                    alt={product.photoId} 
+                    className="block mt-0 mx-auto mb-5 w-12rem shadow-2" 
+                />}
+                {product.photoId===null && <img 
+                    src='demo/images/product/avatar2.png' 
+                    alt='noPhoto'
+                    className="block mt-0 mx-auto mb-5 w-12rem shadow-2" 
+                />}
+
+                <div>
+                    <h3>Name</h3>               
+                    <div>{product.lastName} {product.firstName} {product.middleName}</div> 
+                </div>
+                <div>
+                    <h3>Date of Birth</h3>               
+                    <div>{product.dateOfBirth} </div> 
+                </div>
+                <div>
+                    <h3>Date of Birth</h3>               
+                    <div>{product.dateOfBirth} </div> 
+                </div>
+            </Dialog>    
         </div>
     );
 }
