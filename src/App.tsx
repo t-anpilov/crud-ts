@@ -54,8 +54,7 @@ function App() {
     const [products, setProducts] = useState<Product[]>([]);
     const [productDialog, setProductDialog] = useState(false);
     const [deleteProductDialog, setDeleteProductDialog] = useState(false);
-    const [deleteProductsDialog, setDeleteProductsDialog] = useState(false);
-    const [studentDetails, showStudentDetails] = useState(false); // as a variant
+    const [deleteProductsDialog, setDeleteProductsDialog] = useState(false);    
     const [noEditMode, setEditMode] = useState(true);
     const [product, setProduct] = useState<Product>(emptyProduct);
     const [selectedProducts, setSelectedProducts] = useState<Product[]>([]);
@@ -72,13 +71,12 @@ function App() {
         setProduct(emptyProduct);
         setSubmitted(false);
         setProductDialog(true);
-        showStudentDetails(true);
     }
 
     const hideDialog = () => {
         setSubmitted(false);
         setProductDialog(false);
-        showStudentDetails(false);
+        setEditMode(true)
     }
 
     const allowEdit = () => {
@@ -95,6 +93,7 @@ function App() {
 
     const saveProduct = () => {
         setSubmitted(true);
+        setEditMode(true);
 
         if (product.firstName?.trim() &&product.lastName?.trim()) {
             let _products = [...products];
@@ -116,12 +115,7 @@ function App() {
             setProductDialog(false);
             setProduct(emptyProduct);
         }
-    }
-
-    const showDetails = (product: Product) => {
-        showStudentDetails(true);  
-        setProduct({...product}); 
-    }    
+    }   
 
     const editProduct = (product: Product) => {
         setProduct({...product});
@@ -345,10 +339,10 @@ function App() {
     );
     
     const productDialogFooter = (
-        <React.Fragment>
-            <Button label="Edit" icon="pi pi-check" onClick={allowEdit} />
+        <React.Fragment>            
             <Button label="Cancel" icon="pi pi-times" className="p-button-text" onClick={hideDialog} />
-            <Button label="Save" icon="pi pi-check" onClick={saveProduct} />
+            {noEditMode && <Button label="Edit" icon="pi pi-check" onClick={allowEdit} />}
+            {!noEditMode && <Button label="Save" icon="pi pi-check" onClick={saveProduct} />}
         </React.Fragment>
     );
 
@@ -377,7 +371,7 @@ function App() {
                 paginatorTemplate="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink CurrentPageReport RowsPerPageDropdown"
                 currentPageReportTemplate="Showing {first} to {last} of {totalRecords} products"
                 globalFilter={globalFilter} header={header} responsiveLayout="scroll"
-                onRowDoubleClick={(e)=>showDetails(e.data)}>
+                onRowDoubleClick={(e) => editProduct(e.data)}>
                 <Column selectionMode="multiple" headerStyle={{ width: '3rem' }} exportable={false}></Column>
                 
                 <Column field="image" header="Photo" body={imageBodyTemplate}></Column>
@@ -408,12 +402,12 @@ function App() {
                 </div>
                 <div className="field">
                     <label htmlFor="middleName">Middle Name</label>
-                    <InputText id="middleName" value={product.middleName} onChange={(e) => onNameChange(e, 'middleName')} required className={classNames({ 'p-invalid': submitted && !product.middleName })} />
+                    <InputText id="middleName" disabled={noEditMode} value={product.middleName} onChange={(e) => onNameChange(e, 'middleName')} required className={classNames({ 'p-invalid': submitted && !product.middleName })} />
                     {submitted && !product.middleName && <small className="p-error">Name is required.</small>}
                 </div>
                 <div className="field">
                     <label htmlFor="lastName">Middle Name</label>
-                    <InputText id="lastName" value={product.lastName} onChange={(e) => onNameChange(e, 'lastName')} required className={classNames({ 'p-invalid': submitted && !product.lastName })} />
+                    <InputText id="lastName" disabled={noEditMode} value={product.lastName} onChange={(e) => onNameChange(e, 'lastName')} required className={classNames({ 'p-invalid': submitted && !product.lastName })} />
                     {submitted && !product.lastName && <small className="p-error">Name is required.</small>}
                 </div>
 
@@ -422,7 +416,7 @@ function App() {
                         <label htmlFor="date">Date Of Birth</label>
                         <Calendar 
                             id="date" 
-                            className=""
+                            disabled={noEditMode}
                             value={product.dateOfBirth ? new Date(product.dateOfBirth.toString()) : undefined} 
                             dateFormat="dd.mm.yy" 
                             monthNavigator yearNavigator yearRange="1980:2025"
@@ -431,22 +425,22 @@ function App() {
                     <div className="field col">
                         <label className="mb-3">Gender</label>
                         <div className="field-radiobutton col-4">
-                            <RadioButton inputId="gender1" name="gender" value="Female" onChange={onGenderSet} checked={product.gender === 'FEMALE'}  />
+                            <RadioButton disabled={noEditMode} inputId="gender1" name="gender" value="Female" onChange={onGenderSet} checked={product.gender === 'FEMALE'}  />
                             <label htmlFor="gender1">Female</label>
                         </div>
                         <div className="field-radiobutton col-4">
-                            <RadioButton inputId="gender2" name="gender" value="Male" onChange={onGenderSet} checked={product.gender === 'MALE'} />
+                            <RadioButton disabled={noEditMode} inputId="gender2" name="gender" value="Male" onChange={onGenderSet} checked={product.gender === 'MALE'} />
                             <label htmlFor="gender2">Male</label>
                         </div>                        
                     </div>
                     <div className="field col">
                     <label className="mb-3">Insurance</label>
                         <div className="field-radiobutton col-6">
-                            <RadioButton inputId="insurance1" name="insurance" onChange={onInsuranceChange} checked={product.insurance === true} />
+                            <RadioButton disabled={noEditMode} inputId="insurance1" name="insurance" onChange={onInsuranceChange} checked={product.insurance === true} />
                             <label htmlFor="insurance1">Yes</label>
                         </div>
                         <div className="field-radiobutton col-6">
-                            <RadioButton inputId="insurance2" name="insurance" onChange={onInsuranceChange} checked={product.insurance === false} />
+                            <RadioButton disabled={noEditMode} inputId="insurance2" name="insurance" onChange={onInsuranceChange} checked={product.insurance === false} />
                             <label htmlFor="insurance2">No</label>
                         </div>                        
                     </div>
@@ -456,7 +450,7 @@ function App() {
                 <div className="formgrid grid">  
                     <div className="field col">
                         <label htmlFor="school">School</label>
-                        <InputNumber id="school" value={getNumber(product.school!)} onChange={(e) => onSchoolChange(e)} required className={classNames({ 'p-invalid': submitted && !product.school })} />
+                        <InputNumber disabled={noEditMode} id="school" value={getNumber(product.school!)} onChange={(e) => onSchoolChange(e)} required className={classNames({ 'p-invalid': submitted && !product.school })} />
                         {submitted && !product.lastName && <small className="p-error">Number is required.</small>}
                     </div>                   
                     
@@ -464,6 +458,7 @@ function App() {
                         <label htmlFor="shift">Shift</label>
                         <Dropdown 
                             id="shift" 
+                            disabled={noEditMode}
                             value={product.shift}                                                                     
                             options={ShiftOptions}  
                             onChange={(e) => onShiftChange(e)}
@@ -474,6 +469,7 @@ function App() {
                     <label htmlFor="group">Group</label>
                     <Dropdown 
                         id="group" 
+                        disabled={noEditMode}
                         value={product.groups? showGroup(product.groups) : ''}                                                   
                         options={GroupsOptions}  
                         onChange={(e) => onGroupsChange(e)}
@@ -493,39 +489,7 @@ function App() {
                     <i className="pi pi-exclamation-triangle mr-3" style={{ fontSize: '2rem'}} />
                     {product && <span>Are you sure you want to remove the selected students?</span>}
                 </div>
-            </Dialog>
-
-            <Dialog 
-                visible={studentDetails} 
-                breakpoints={{'960px': '75vw', '800px': '100vw'}} 
-                style={{width: '40vw'}} header="Student Profile" 
-                modal className="p-fluid" 
-                onHide={hideDialog}>
-
-                {product.photoId && <img 
-                    src={`demo/images/product/${product.photoId}`} 
-                    alt={product.photoId} 
-                    className="block mt-0 mx-auto mb-5 w-12rem shadow-2" 
-                />}
-                {product.photoId===null && <img 
-                    src='demo/images/product/avatar2.png' 
-                    alt='noPhoto'
-                    className="block mt-0 mx-auto mb-5 w-12rem shadow-2" 
-                />}
-
-                <div>
-                    <h3>Name</h3>               
-                    <div>{product.lastName} {product.firstName} {product.middleName}</div> 
-                </div>
-                <div>
-                    <h3>Date of Birth</h3>               
-                    <div>{product.dateOfBirth} </div> 
-                </div>
-                <div>
-                    <h3>Date of Birth</h3>               
-                    <div>{product.dateOfBirth} </div> 
-                </div>
-            </Dialog>    
+            </Dialog>   
         </div>
     );
 }
