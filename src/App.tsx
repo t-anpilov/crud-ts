@@ -5,8 +5,6 @@ import { Column } from 'primereact/column';
 import { getProducts } from './ProductService';
 import { Toast } from 'primereact/toast';
 import { Button } from 'primereact/button';
-//import { Rating } from 'primereact/rating';
-//import { InputTextarea } from 'primereact/inputtextarea';
 import { RadioButton, RadioButtonChangeParams } from 'primereact/radiobutton';
 import { InputNumber, InputNumberChangeParams } from 'primereact/inputnumber';
 import { Dialog } from 'primereact/dialog';
@@ -17,16 +15,15 @@ import 'primereact/resources/themes/saga-blue/theme.css';
 import 'primereact/resources/primereact.min.css';
 import 'primeicons/primeicons.css';
 import 'primeflex/primeflex.css';
-//import { groupCollapsed } from 'console';
 
 interface Product {
-    id?: string | number;
+    id: string | number;
     firstName: string;
     lastName: string;
     middleName: string;
     photoId?: string | null;
-    gender?: string;
-    dateOfBirth?: Date | Date[];
+    gender: string;
+    dateOfBirth: Date | Date[];
     insurance?: boolean;
     school?: string;
     shift?: Shifts;
@@ -43,7 +40,9 @@ function App() {
         firstName: '',
         lastName: '',
         middleName: '',
-        photoId: '',
+        dateOfBirth: new Date(),
+        gender: '',
+        photoId: null,
         insurance: false,
         school: '',
         shift: '',
@@ -156,10 +155,6 @@ function App() {
         return id;
     }
 
-    const exportCSV = () => {
-        dt.current?.exportCSV({selectionOnly:false});
-    }
-
     const confirmDeleteSelected = () => {
         setDeleteProductsDialog(true);
     }
@@ -213,7 +208,7 @@ function App() {
         if (e.target.value!==null)   {
             const val = (e.target && e.target.value);
             let _product = {...product};
-            _product.dateOfBirth = val;
+            if (val) _product.dateOfBirth = val;
             setProduct(_product);
         }  
     }
@@ -248,15 +243,7 @@ function App() {
         let _product = {...product};
         _product['insurance'] = e.value;
         setProduct(_product);
-    }
-
-    const imageBodyTemplate = (rowData: Product) => {
-        if(rowData.photoId && rowData.photoId!==null) {
-            return <img src={`demo/images/product/${rowData.photoId}`} alt={rowData.photoId} className="w-5rem shadow-2" />
-        } else {
-            return <img src='demo/images/product/avatar2.png' alt='default avatar' className="w-5rem shadow-2" />
-        }        
-    }
+    }    
 
     const nameBodyTemplate = (rowData: Product) => {
         if(rowData.firstName && rowData.lastName && rowData.middleName) {
@@ -279,41 +266,12 @@ function App() {
         } 
     }
 
-    const shiftBodyTemplate = (rowData: Product) => {
-        if(rowData.shift && rowData.shift === "FIRST") {
-            return <span>1</span>
-        } else if (rowData.shift && rowData.shift === "SECOND") {
-            return <span>2</span>
-        }        
-    }
-    
-    
-    const groupBodyTemplate = (rowData: Product) => {        
-        if(rowData.groups) {            
-            return <div> {
-                rowData.groups.map((group) =>  `${group.groupDescription} `)
-            } </div>                        
-        }  
-    }
-
     const genderBodyTemplate = (rowData: Product) => {
         if (rowData.gender) {
             let text = rowData.gender
             return <span> {text[0] + text.slice(1).toLowerCase()} </span>
         } 
     }
-
-    /*const priceBodyTemplate = (rowData: Product) => {
-        return (rowData.price !== undefined) ? formatCurrency(rowData.price): '';
-    }
-
-    const ratingBodyTemplate = (rowData: Product) => {
-        return <Rating value={rowData.rating} readOnly cancel={false} />;
-    }
-
-    const statusBodyTemplate = (rowData: Product) => {
-        return <span className={`product-badge status-${rowData.inventoryStatus?.toLowerCase()}`}>{rowData.inventoryStatus}</span>;
-    }*/
 
     const actionBodyTemplate = (rowData: Product) => {
         return (
@@ -333,7 +291,7 @@ function App() {
             <div className="mt-3 md:mt-0 flex justify-content-end">
                 <Button icon="pi pi-plus" className="mr-2 p-button-rounded" onClick={openNew} tooltip="New" tooltipOptions={{position: 'bottom'}} />
                 <Button icon="pi pi-trash" className="p-button-danger mr-2 p-button-rounded" onClick={confirmDeleteSelected} disabled={!selectedProducts || !selectedProducts.length} tooltip="Delete" tooltipOptions={{position: 'bottom'}} />
-                <Button icon="pi pi-upload" className="p-button-help p-button-rounded" onClick={exportCSV} tooltip="Export" tooltipOptions={{position: 'bottom'}} />
+                
             </div>
         </div>
     );
@@ -366,6 +324,7 @@ function App() {
 
             <div className="text-3xl text-800 font-bold mb-4">STUDENTS</div>
 
+            
             <DataTable ref={dt} value={products} selection={selectedProducts} onSelectionChange={(e) => setSelectedProducts(e.value)}
                 dataKey="id" paginator rows={10} rowsPerPageOptions={[5, 10, 25]}
                 paginatorTemplate="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink CurrentPageReport RowsPerPageDropdown"
@@ -374,11 +333,8 @@ function App() {
                 onRowDoubleClick={(e) => editProduct(e.data)}>
                 <Column selectionMode="multiple" headerStyle={{ width: '3rem' }} exportable={false}></Column>
                 
-                <Column field="image" header="Photo" body={imageBodyTemplate}></Column>
                 <Column field="fullname" sortField="lastName" header="Name" body={nameBodyTemplate} sortable style={{ minWidth: '16rem' }}></Column>                
                 <Column field="dateOfBirth" header="Date Of Birth" body={dateBodyTemplate} sortable style={{ minWidth: '10rem' }}></Column> 
-                <Column field="shift" header="Shift" body={shiftBodyTemplate} sortable style={{ minWidth: '6rem' }}></Column> 
-                <Column field="groups" header="Groups" body={groupBodyTemplate} sortable style={{ minWidth: '16rem' }}></Column>              
                 <Column field="gender" header="Gender" body={genderBodyTemplate} sortable style={{ minWidth: '8rem' }}></Column>
                                 
                 <Column body={actionBodyTemplate} exportable={false} style={{ minWidth: '8rem' }}></Column>
