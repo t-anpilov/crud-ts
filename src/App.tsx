@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef, ChangeEvent, FormEvent } from 'reac
 import { classNames } from 'primereact/utils';
 import { DataTable } from 'primereact/datatable';
 import { Column } from 'primereact/column';
-import { getProducts } from './ProductService';
+import { getStudents } from './GetStudents';
 import { Toast } from 'primereact/toast';
 import { Button } from 'primereact/button';
 import { RadioButton, RadioButtonChangeParams } from 'primereact/radiobutton';
@@ -50,7 +50,7 @@ function App() {
 
     };
 
-    const [products, setProducts] = useState<Product[]>([]);
+    const [products, setStudents] = useState<Product[]>([]);
     const [productDialog, setProductDialog] = useState(false);
     const [deleteProductDialog, setDeleteProductDialog] = useState(false);
     const [deleteProductsDialog, setDeleteProductsDialog] = useState(false);    
@@ -63,7 +63,7 @@ function App() {
     const dt = useRef<DataTable>(null);
 
     useEffect(() => {
-        getProducts().then(data => setProducts(data));
+        getStudents().then(data => setStudents(data));
     }, []);
     
     const openNew = () => {
@@ -110,14 +110,26 @@ function App() {
                 toast.current?.show({ severity: 'success', summary: 'Successful', detail: 'Student\'s Profile Updated', life: 3000 });
             }
 
-            setProducts(_products);
+            setStudents(_products); // shouldn't work
             setProductDialog(false);
             setProduct(emptyProduct);
         }
-    }   
+    } 
+    
+    const getStudentDetails = (id: string | number) => fetch(`http://localhost:8080/students/${id}`, {
+        method: 'GET', mode: 'cors'
+    }) 
+        .then(res => res.json())
+        .then(data =>  {
+        console.log(data);
+        return data;
+    })  
 
-    const editProduct = (product: Product) => {
-        setProduct({...product});
+    const editProduct = async (product: Product) => {
+        
+        let studentDetails = getStudentDetails(product.id)
+
+        setProduct(await studentDetails);
         setProductDialog(true);
     }
 
@@ -125,10 +137,10 @@ function App() {
         setProduct(product);
         setDeleteProductDialog(true);
     }
-
+  // q if we need
     const deleteProduct = () => {
         let _products = products.filter(val => val.id !== product.id);
-        setProducts(_products);
+        setStudents(_products); 
         setDeleteProductDialog(false);
         setProduct(emptyProduct);
         toast.current?.show({ severity: 'success', summary: 'Successful', detail: 'Student Removed', life: 3000 });
@@ -155,13 +167,15 @@ function App() {
         return id;
     }
 
+
     const confirmDeleteSelected = () => {
         setDeleteProductsDialog(true);
     }
 
+    // q if we need
     const deleteSelectedProducts = () => {
         let _products = products.filter(val => !selectedProducts.includes(val));
-        setProducts(_products);
+        setStudents(_products);
         setDeleteProductsDialog(false);
         setSelectedProducts([]);
         toast.current?.show({ severity: 'success', summary: 'Successful', detail: 'Products Deleted', life: 3000 });
@@ -273,6 +287,7 @@ function App() {
         } 
     }
 
+    // there is action to open details
     const actionBodyTemplate = (rowData: Product) => {
         return (
             <React.Fragment>
@@ -337,7 +352,7 @@ function App() {
                 <Column field="dateOfBirth" header="Date Of Birth" body={dateBodyTemplate} sortable style={{ minWidth: '10rem' }}></Column> 
                 <Column field="gender" header="Gender" body={genderBodyTemplate} sortable style={{ minWidth: '8rem' }}></Column>
                                 
-                <Column body={actionBodyTemplate} exportable={false} style={{ minWidth: '8rem' }}></Column>
+                <Column body={actionBodyTemplate} exportable={false} style={{ minWidth: '8rem', textAlign: 'right' }} bodyClassName='right_control'></Column>
             </DataTable>
 
             <Dialog visible={productDialog} breakpoints={{'960px': '75vw', '640px': '100vw'}} style={{width: '40vw'}} header="Student Profile" modal className="p-fluid" footer={productDialogFooter} onHide={hideDialog}>
