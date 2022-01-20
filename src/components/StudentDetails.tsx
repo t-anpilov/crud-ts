@@ -1,20 +1,21 @@
-import React, { useState, useRef, FormEvent } from 'react';
+import React, { useState, useRef, FormEvent, ChangeEvent } from 'react';
 import { Calendar, CalendarChangeParams } from 'primereact/calendar'
-import { Toast } from 'primereact/toast';
+import { RadioButton, RadioButtonChangeParams  } from 'primereact/radiobutton'
+import { InputNumber, InputNumberChangeParams } from 'primereact/inputnumber'
+import { Dropdown, DropdownChangeParams } from 'primereact/dropdown'
 import { Button } from 'primereact/button';
 import { Dialog } from 'primereact/dialog';
 import { InputText } from 'primereact/inputtext';
+import { classNames } from 'primereact/utils'; 
 import 'primereact/resources/themes/saga-blue/theme.css';
 import 'primereact/resources/primereact.min.css';
 import 'primeicons/primeicons.css';
 import 'primeflex/primeflex.css';
-import { Product } from '../App'  
+import { Product, Shifts, Group } from '../App'  
 
-interface StudentDetailsProps {
-    student: Product
-}
+type StudentDetailsProps = { isVisible: boolean }
 
-const StudentDetails: React.FC<StudentDetailsProps> = student => {
+const StudentDetails: React.FC<StudentDetailsProps> = isVisible => {
     let emptyProduct: Product = {
         id: '',
         firstName: '',
@@ -29,18 +30,17 @@ const StudentDetails: React.FC<StudentDetailsProps> = student => {
         groups: []
 
     };
-
-    const [/*products*/, setStudents] = useState<Product[]>([]);
-    const [productDialog, setProductDialog] = useState(false);   
+    
+    const [visibleDialog, setVisibleDialog] = useState(false);   
     const [noEditMode, setEditMode] = useState(true);
     const [product, setProduct] = useState<Product>(emptyProduct);    
     const [submitted, setSubmitted] = useState(false);    
-    const toast = useRef<Toast>(null);
+    //const toast = useRef<Toast>(null);
     
     
     const hideDialog = () => {
         setSubmitted(false);
-        setProductDialog(false);
+        setVisibleDialog(false);
         setEditMode(true)
     }
 
@@ -98,6 +98,88 @@ const StudentDetails: React.FC<StudentDetailsProps> = student => {
     }*/
 
     // need to change to save Element function onclick for 2nd buttom
+
+    const onGenderSet = (e: RadioButtonChangeParams) => {
+        let _product = {...product};
+        _product['gender'] = e.value;
+        setProduct(_product);
+    }
+
+    const onNameChange = (e: ChangeEvent<HTMLInputElement>, prop: 'firstName'|'lastName'|'middleName') => {
+        const val = (e.target && e.target.value) || '';
+        let _product: Product = {...product};
+        if (prop === 'firstName') {
+            _product.firstName = val;
+        } else if (prop === 'lastName') {
+            _product.lastName = val;
+        } else if (prop === 'middleName') {
+            _product.middleName = val;
+        }    
+        setProduct(_product);
+    } 
+    
+    const getNumber = (str: string):number => {
+        let num: number = 0
+        for (let i=0; i<str.length; i++) {
+            if(!isNaN(Number(str[i]))) {
+               num = i  
+               break              
+            }
+        }
+        return parseInt( str.slice(num) )   
+    } 
+    
+    const onSchoolChange = (e: InputNumberChangeParams) => {
+        const val = e && e.value;
+        let _product = {...product};
+        _product.school =  '#' + val;
+        setProduct(_product);
+    }
+
+    const onDateChange = (e: CalendarChangeParams) => {
+        if (e.target.value!==null)   {
+            const val = (e.target && e.target.value);
+            let _product = {...product};
+            if (val) _product.dateOfBirth = val;
+            setProduct(_product);
+        }  
+    }
+
+    const ShiftOptions: Shifts[] = ["FIRST", "SECOND"]
+
+    const onShiftChange = (e: DropdownChangeParams) => {
+        const val = e.target && e.target.value;
+        let _product = {...product};        
+        _product.shift = val;   
+        setProduct(_product);        
+    }
+
+    const GroupsOptions = (obj: Group[]) => {        
+        return Object.keys(obj).filter(k => typeof obj[k as any] === "number")
+    } 
+
+    const showGroup = (data: Group[]) => {
+        let result: string[] = []
+        data.forEach((group) => result.push(group.groupDescription))        
+        return result.join(', ')
+    }
+
+    const onGroupsChange = (e: DropdownChangeParams) => {
+        const val = e.target && e.target.value;
+        let _product = {...product};        
+        if (_product.groups) {
+            _product.groups.push({id: 1000, groupDescription: val});
+            setProduct(_product); 
+        }  
+    }
+
+    const onInsuranceChange = (e: RadioButtonChangeParams) => {
+        let _product = {...product};
+        _product['insurance'] = e.value;
+        setProduct(_product);
+    }    
+
+
     const productDialogFooter = (
         <React.Fragment>            
             <Button label="Cancel" icon="pi pi-times" className="p-button-text" onClick={hideDialog} />
@@ -108,7 +190,7 @@ const StudentDetails: React.FC<StudentDetailsProps> = student => {
 
 
     return (
-        <Dialog visible={productDialog} breakpoints={{'960px': '75vw', '640px': '100vw'}} style={{width: '40vw'}} header="Student Profile" modal className="p-fluid" footer={productDialogFooter} onHide={hideDialog}>
+        isVisible && <Dialog visible={visibleDialog} breakpoints={{'960px': '75vw', '640px': '100vw'}} style={{width: '40vw'}} header="Student Profile" modal className="p-fluid" footer={productDialogFooter} onHide={hideDialog}>
                 {product.photoId && <img 
                     src={`demo/images/product/${product.photoId}`} 
                     alt={product.photoId} 
@@ -195,7 +277,7 @@ const StudentDetails: React.FC<StudentDetailsProps> = student => {
                         id="group" 
                         disabled={noEditMode}
                         value={product.groups? showGroup(product.groups) : ''}                                                   
-                        options={GroupsOptions}  
+                        options={GroupsOptions(product.groups!)}  
                         onChange={(e) => onGroupsChange(e)}
                         placeholder='Select a group' />
                 </div>

@@ -20,22 +20,21 @@ export interface Product {
     groups?: Group[]
 }
 
-type Group = {id: string | number, groupDescription: string}
-type Shifts = "FIRST" | "SECOND" | ""
+export type Group = {id: string | number, groupDescription: string}
+export type Shifts = "FIRST" | "SECOND" | ""
 
 const App: React.FC = () => {    
 
-    const [products, setStudents] = useState<Product[]>([]);
+    const [studentsData, setStudentsData] = useState<Product[]>([]);
     
 
     useEffect(() => {
-        getStudents().then(data => setStudents(data));
-    }, []);    
-    
+        getStudents().then(data => setStudentsData(data));
+    }, []);
 
     return (
         <div>
-            <StudentsList students={products} />
+           <StudentsList students={studentsData} />
         </div>  
     );
 }

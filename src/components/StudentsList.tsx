@@ -16,7 +16,7 @@ interface StudentsListProps {
     students: Product []
 }
 
-const StudentsList: React.FC<StudentsListProps> = students => {
+const StudentsList: React.FC<StudentsListProps> = ({students}) => {
     let emptyProduct: Product = {
         id: '',
         firstName: '',
@@ -32,14 +32,13 @@ const StudentsList: React.FC<StudentsListProps> = students => {
 
     };
 
-    const [/*products*/, setStudents] = useState<Product[]>([]);
-    const [/*productDialog*/, setProductDialog] = useState(false);
+    const [studentsList, setStudentsList] = useState<Product[]>([]);
+    const [productDialog, setProductDialog] = useState(false);
     const [deleteProductDialog, setDeleteProductDialog] = useState(false);
-    const [deleteProductsDialog, setDeleteProductsDialog] = useState(false);    
-    //const [noEditMode, setEditMode] = useState(true);
+    const [deleteProductsDialog, setDeleteProductsDialog] = useState(false);  
     const [product, setProduct] = useState<Product>(emptyProduct);
     const [selectedProducts, setSelectedProducts] = useState<Product[]>([]);
-    const [/*submitted*/, setSubmitted] = useState(false);
+    //const [submitted, setSubmitted] = useState(false);
     const [globalFilter, setGlobalFilter] = useState<string>();
     const toast = useRef<Toast>(null);
     const dt = useRef<DataTable>(null);
@@ -47,7 +46,7 @@ const StudentsList: React.FC<StudentsListProps> = students => {
     
     const openNew = () => {
         setProduct(emptyProduct);
-        setSubmitted(false);
+        //setSubmitted(false);
         setProductDialog(true);
     } 
 
@@ -86,7 +85,7 @@ const StudentsList: React.FC<StudentsListProps> = students => {
         let _products : Product []
         if (Array.isArray(students)) {
             _products = students.filter((val: { id: string | number; }) => val.id !== product.id);
-            setStudents(_products); 
+            setStudentsList(_products); 
         setDeleteProductDialog(false);
         setProduct(emptyProduct);
         toast.current?.show({ severity: 'success', summary: 'Successful', detail: 'Student Removed', life: 3000 });
@@ -101,11 +100,12 @@ const StudentsList: React.FC<StudentsListProps> = students => {
         let _products : Product []
         if (Array.isArray(students)) {
             _products = students.filter((val: Product) => !selectedProducts.includes(val));
-            setStudents(_products);
+            setStudentsList(_products);
             setDeleteProductsDialog(false);
             setSelectedProducts([]);
             toast.current?.show({ severity: 'success', summary: 'Successful', detail: 'Products Deleted', life: 3000 });
         }
+        console.log (studentsList) // checking rempve function
     }    
 
     const nameBodyTemplate = (rowData: Product) => {
@@ -174,6 +174,9 @@ const StudentsList: React.FC<StudentsListProps> = students => {
         </React.Fragment>
     );
 
+    
+    console.log (students) 
+
     return (
         <div className="datatable-crud-demo surface-card p-4 border-round shadow-2">
             <Toast ref={toast} />
@@ -181,7 +184,7 @@ const StudentsList: React.FC<StudentsListProps> = students => {
             <div className="text-3xl text-800 font-bold mb-4">STUDENTS</div>
 
             
-            <DataTable ref={dt} value={Array.isArray(students) ? students : undefined} selection={selectedProducts} onSelectionChange={(e) => setSelectedProducts(e.value)}
+            <DataTable ref={dt} value={ students} selection={selectedProducts} onSelectionChange={(e) => setSelectedProducts(e.value)}
                 dataKey="id" paginator rows={10} rowsPerPageOptions={[5, 10, 25]}
                 paginatorTemplate="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink CurrentPageReport RowsPerPageDropdown"
                 currentPageReportTemplate="Showing {first} to {last} of {totalRecords} products"
@@ -196,7 +199,8 @@ const StudentsList: React.FC<StudentsListProps> = students => {
                 <Column body={actionBodyTemplate} exportable={false} style={{ minWidth: '8rem', textAlign: 'right' }} bodyClassName='right_control'></Column>
             </DataTable>
 
-            <StudentDetails product={} />
+            <StudentDetails isVisible={productDialog} />
+
             <Dialog visible={deleteProductDialog} style={{ width: '450px' }} header="Confirm" modal footer={deleteProductDialogFooter} onHide={hideDeleteProductDialog}>
                 <div className="flex align-items-center justify-content-center">
                     <i className="pi pi-exclamation-triangle mr-3" style={{ fontSize: '2rem'}} />
