@@ -38,7 +38,8 @@ const StudentsList: React.FC<StudentsListProps> = ({students}) => {
     const [deleteProductsDialog, setDeleteProductsDialog] = useState(false);  
     const [product, setProduct] = useState<Product>(emptyProduct);
     const [selectedProducts, setSelectedProducts] = useState<Product[]>([]);
-    //const [submitted, setSubmitted] = useState(false);
+    const [noEdit, setNoEdit] = useState(true);
+    const [submitted, setSubmitted] = useState(false);
     const [globalFilter, setGlobalFilter] = useState<string>();
     const toast = useRef<Toast>(null);
     const dt = useRef<DataTable>(null);
@@ -46,9 +47,18 @@ const StudentsList: React.FC<StudentsListProps> = ({students}) => {
     
     const openNew = () => {
         setProduct(emptyProduct);
-        //setSubmitted(false);
+        setSubmitted(false);
         setProductDialog(true);
     } 
+    const allowEditHandler = () => {
+        setNoEdit(false)
+    }
+
+    const hideDialogHandler = () => {
+        setProductDialog(false)
+        setSubmitted(false);                
+        setNoEdit(true)
+    }    
 
     const hideDeleteProductDialog = () => {
         setDeleteProductDialog(false);
@@ -199,7 +209,7 @@ const StudentsList: React.FC<StudentsListProps> = ({students}) => {
                 <Column body={actionBodyTemplate} exportable={false} style={{ minWidth: '8rem', textAlign: 'right' }} bodyClassName='right_control'></Column>
             </DataTable>
 
-            <StudentDetails isVisible={productDialog} />
+            <StudentDetails isVisible={productDialog} noEditMode={noEdit} hideDialog={hideDialogHandler} allowEdit={allowEditHandler}/>
 
             <Dialog visible={deleteProductDialog} style={{ width: '450px' }} header="Confirm" modal footer={deleteProductDialogFooter} onHide={hideDeleteProductDialog}>
                 <div className="flex align-items-center justify-content-center">

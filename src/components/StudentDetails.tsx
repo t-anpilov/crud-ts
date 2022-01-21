@@ -1,4 +1,4 @@
-import React, { useState, useRef, FormEvent, ChangeEvent } from 'react';
+import React, { useState, ChangeEvent } from 'react';
 import { Calendar, CalendarChangeParams } from 'primereact/calendar'
 import { RadioButton, RadioButtonChangeParams  } from 'primereact/radiobutton'
 import { InputNumber, InputNumberChangeParams } from 'primereact/inputnumber'
@@ -13,9 +13,14 @@ import 'primeicons/primeicons.css';
 import 'primeflex/primeflex.css';
 import { Product, Shifts, Group } from '../App'  
 
-type StudentDetailsProps = { isVisible: boolean }
+type StudentDetailsProps = { 
+    isVisible: boolean;
+    noEditMode: boolean;
+    hideDialog: () => void;
+    allowEdit: () => void
+ }
 
-const StudentDetails: React.FC<StudentDetailsProps> = isVisible => {
+const StudentDetails: React.FC<StudentDetailsProps> = props => {
     let emptyProduct: Product = {
         id: '',
         firstName: '',
@@ -31,22 +36,21 @@ const StudentDetails: React.FC<StudentDetailsProps> = isVisible => {
 
     };
     
-    const [visibleDialog, setVisibleDialog] = useState(false);   
-    const [noEditMode, setEditMode] = useState(true);
+    //const [visibleDialog, setVisibleDialog] = useState(false);   
+    
     const [product, setProduct] = useState<Product>(emptyProduct);    
     const [submitted, setSubmitted] = useState(false);    
     //const toast = useRef<Toast>(null);
     
-    
-    const hideDialog = () => {
-        setSubmitted(false);
-        setVisibleDialog(false);
-        setEditMode(true)
+        
+    /*const hideDialog = () => {        
+        setSubmitted(false);                
+        setNoEditMode(true)
     }
 
     const allowEdit = () => {
-        setEditMode(false)
-    }
+        setNoEditMode(false)
+    }*/
     
 
     /*const saveProduct = () => {
@@ -182,17 +186,24 @@ const StudentDetails: React.FC<StudentDetailsProps> = isVisible => {
 
     const productDialogFooter = (
         <React.Fragment>            
-            <Button label="Cancel" icon="pi pi-times" className="p-button-text" onClick={hideDialog} />
-            {noEditMode && <Button label="Edit" icon="pi pi-check" onClick={allowEdit} />}
-            {!noEditMode && <Button label="Save" icon="pi pi-check" onClick={hideDialog} />} 
+            <Button label="Cancel" icon="pi pi-times" className="p-button-text" onClick={props.hideDialog} />
+            {props.noEditMode && <Button label="Edit" icon="pi pi-check" onClick={props.allowEdit} />}
+            {!props.noEditMode && <Button label="Save" icon="pi pi-check" onClick={props.hideDialog} />} 
         </React.Fragment>
     );
 
 
     return (
-        isVisible && <Dialog visible={visibleDialog} breakpoints={{'960px': '75vw', '640px': '100vw'}} style={{width: '40vw'}} header="Student Profile" modal className="p-fluid" footer={productDialogFooter} onHide={hideDialog}>
+        <Dialog 
+            visible={props.isVisible} 
+            breakpoints={{'960px': '75vw', '640px': '100vw'}} 
+            style={{width: '40vw'}} 
+            header="Student Profile" 
+            modal className="p-fluid" 
+            footer={productDialogFooter} 
+            onHide={props.hideDialog}>
                 {product.photoId && <img 
-                    src={`demo/images/product/${product.photoId}`} 
+                    src={`demo/images/prvisibleDialog,duct/${product.photoId}`} 
                     alt={product.photoId} 
                     className="block mt-0 mx-auto mb-5 w-12rem shadow-2" 
                 />}
@@ -203,17 +214,17 @@ const StudentDetails: React.FC<StudentDetailsProps> = isVisible => {
                 />}
                 <div className="field">
                     <label htmlFor="firstName">First Name</label>
-                    <InputText id="firstName" disabled={noEditMode} value={product.firstName} onChange={(e) => onNameChange(e, 'firstName')} required className={classNames({ 'p-invalid': submitted && !product.firstName })} />
+                    <InputText id="firstName" disabled={props.noEditMode} value={product.firstName} onChange={(e) => onNameChange(e, 'firstName')} required className={classNames({ 'p-invalid': submitted && !product.firstName })} />
                     {submitted && !product.firstName && <small className="p-error">Name is required.</small>}
                 </div>
                 <div className="field">
                     <label htmlFor="middleName">Middle Name</label>
-                    <InputText id="middleName" disabled={noEditMode} value={product.middleName} onChange={(e) => onNameChange(e, 'middleName')} required className={classNames({ 'p-invalid': submitted && !product.middleName })} />
+                    <InputText id="middleName" disabled={props.noEditMode} value={product.middleName} onChange={(e) => onNameChange(e, 'middleName')} required className={classNames({ 'p-invalid': submitted && !product.middleName })} />
                     {submitted && !product.middleName && <small className="p-error">Name is required.</small>}
                 </div>
                 <div className="field">
                     <label htmlFor="lastName">Middle Name</label>
-                    <InputText id="lastName" disabled={noEditMode} value={product.lastName} onChange={(e) => onNameChange(e, 'lastName')} required className={classNames({ 'p-invalid': submitted && !product.lastName })} />
+                    <InputText id="lastName" disabled={props.noEditMode} value={product.lastName} onChange={(e) => onNameChange(e, 'lastName')} required className={classNames({ 'p-invalid': submitted && !product.lastName })} />
                     {submitted && !product.lastName && <small className="p-error">Name is required.</small>}
                 </div>
 
@@ -222,7 +233,7 @@ const StudentDetails: React.FC<StudentDetailsProps> = isVisible => {
                         <label htmlFor="date">Date Of Birth</label>
                         <Calendar 
                             id="date" 
-                            disabled={noEditMode}
+                            disabled={props.noEditMode}
                             value={product.dateOfBirth ? new Date(product.dateOfBirth.toString()) : undefined} 
                             dateFormat="dd.mm.yy" 
                             monthNavigator yearNavigator yearRange="1980:2025"
@@ -231,22 +242,22 @@ const StudentDetails: React.FC<StudentDetailsProps> = isVisible => {
                     <div className="field col">
                         <label className="mb-3">Gender</label>
                         <div className="field-radiobutton col-4">
-                            <RadioButton disabled={noEditMode} inputId="gender1" name="gender" value="Female" onChange={onGenderSet} checked={product.gender === 'FEMALE'}  />
+                            <RadioButton disabled={props.noEditMode} inputId="gender1" name="gender" value="Female" onChange={onGenderSet} checked={product.gender === 'FEMALE'}  />
                             <label htmlFor="gender1">Female</label>
                         </div>
                         <div className="field-radiobutton col-4">
-                            <RadioButton disabled={noEditMode} inputId="gender2" name="gender" value="Male" onChange={onGenderSet} checked={product.gender === 'MALE'} />
+                            <RadioButton disabled={props.noEditMode} inputId="gender2" name="gender" value="Male" onChange={onGenderSet} checked={product.gender === 'MALE'} />
                             <label htmlFor="gender2">Male</label>
                         </div>                        
                     </div>
                     <div className="field col">
                     <label className="mb-3">Insurance</label>
                         <div className="field-radiobutton col-6">
-                            <RadioButton disabled={noEditMode} inputId="insurance1" name="insurance" onChange={onInsuranceChange} checked={product.insurance === true} />
+                            <RadioButton disabled={props.noEditMode} inputId="insurance1" name="insurance" onChange={onInsuranceChange} checked={product.insurance === true} />
                             <label htmlFor="insurance1">Yes</label>
                         </div>
                         <div className="field-radiobutton col-6">
-                            <RadioButton disabled={noEditMode} inputId="insurance2" name="insurance" onChange={onInsuranceChange} checked={product.insurance === false} />
+                            <RadioButton disabled={props.noEditMode} inputId="insurance2" name="insurance" onChange={onInsuranceChange} checked={product.insurance === false} />
                             <label htmlFor="insurance2">No</label>
                         </div>                        
                     </div>
@@ -256,7 +267,7 @@ const StudentDetails: React.FC<StudentDetailsProps> = isVisible => {
                 <div className="formgrid grid">  
                     <div className="field col">
                         <label htmlFor="school">School</label>
-                        <InputNumber disabled={noEditMode} id="school" value={getNumber(product.school!)} onChange={(e) => onSchoolChange(e)} required className={classNames({ 'p-invalid': submitted && !product.school })} />
+                        <InputNumber disabled={props.noEditMode} id="school" value={getNumber(product.school!)} onChange={(e) => onSchoolChange(e)} required className={classNames({ 'p-invalid': submitted && !product.school })} />
                         {submitted && !product.lastName && <small className="p-error">Number is required.</small>}
                     </div>                   
                     
@@ -264,7 +275,7 @@ const StudentDetails: React.FC<StudentDetailsProps> = isVisible => {
                         <label htmlFor="shift">Shift</label>
                         <Dropdown 
                             id="shift" 
-                            disabled={noEditMode}
+                            disabled={props.noEditMode}
                             value={product.shift}                                                                     
                             options={ShiftOptions}  
                             onChange={(e) => onShiftChange(e)}
@@ -275,7 +286,7 @@ const StudentDetails: React.FC<StudentDetailsProps> = isVisible => {
                     <label htmlFor="group">Group</label>
                     <Dropdown 
                         id="group" 
-                        disabled={noEditMode}
+                        disabled={props.noEditMode}
                         value={product.groups? showGroup(product.groups) : ''}                                                   
                         options={GroupsOptions(product.groups!)}  
                         onChange={(e) => onGroupsChange(e)}
