@@ -71,8 +71,8 @@ const StudentsList: React.FC<StudentsListProps> = ({students}) => {
     }   
     
     const editProduct = async (product: Product) => {  
-
-        setCurrentStudent(await getStudentDetails(product.id));        
+        let _currentStudent = await getStudentDetails(product.id)
+        setCurrentStudent({..._currentStudent});        
         setProductDialog(true);
     }
     
@@ -176,7 +176,8 @@ const StudentsList: React.FC<StudentsListProps> = ({students}) => {
     );
 
     
-    console.log (students) 
+    //console.log (students) 
+    console.log ('state variable', currentStudent) 
 
     return (
         <div className="datatable-crud-demo surface-card p-4 border-round shadow-2">

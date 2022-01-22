@@ -1,4 +1,4 @@
-import React, { useState, ChangeEvent } from 'react';
+import React, { useState, ChangeEvent, useEffect } from 'react';
 import { Calendar, CalendarChangeParams } from 'primereact/calendar'
 import { RadioButton, RadioButtonChangeParams  } from 'primereact/radiobutton'
 import { InputNumber, InputNumberChangeParams } from 'primereact/inputnumber'
@@ -40,7 +40,11 @@ const StudentDetails: React.FC<StudentDetailsProps> = props => {
     //const [visibleDialog, setVisibleDialog] = useState(false);   
     
     const [product, setProduct] = useState<Product>(props.studentDetailedData || emptyProduct);    
-    const [submitted, setSubmitted] = useState(false);  
+    const [submitted, setSubmitted] = useState(false); 
+    
+    useEffect(() => {
+       setProduct(props.studentDetailedData);
+    }, [props.studentDetailedData])
     
     //if (props.studentDetailedData) setProduct(props.studentDetailedData)
     //const toast = useRef<Toast>(null);
@@ -194,8 +198,6 @@ const StudentDetails: React.FC<StudentDetailsProps> = props => {
             {!props.noEditMode && <Button label="Save" icon="pi pi-check" onClick={props.hideDialog} />} 
         </React.Fragment>
     );
-
-    console.log (product) 
 
     return (
         <Dialog 
