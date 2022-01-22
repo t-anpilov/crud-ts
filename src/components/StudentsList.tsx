@@ -48,7 +48,7 @@ const StudentsList: React.FC<StudentsListProps> = ({students}) => {
     
     
     const openNew = () => {
-        setProduct(emptyProduct);
+        setCurrentStudent(emptyProduct);
         setSubmitted(false);
         setProductDialog(true);
     } 

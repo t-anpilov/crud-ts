@@ -229,7 +229,7 @@ const StudentDetails: React.FC<StudentDetailsProps> = props => {
                     {submitted && !product.middleName && <small className="p-error">Name is required.</small>}
                 </div>
                 <div className="field">
-                    <label htmlFor="lastName">Middle Name</label>
+                    <label htmlFor="lastName">Last Name</label>
                     <InputText id="lastName" disabled={props.noEditMode} value={product.lastName} onChange={(e) => onNameChange(e, 'lastName')} required className={classNames({ 'p-invalid': submitted && !product.lastName })} />
                     {submitted && !product.lastName && <small className="p-error">Name is required.</small>}
                 </div>
