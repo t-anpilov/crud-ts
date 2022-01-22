@@ -3,10 +3,16 @@ function getStudents() {
         method: 'GET',
         mode: 'cors'})    
     .then(res => res.json())
-    .then(d =>  {
-        console.log(d.content);
-        return d.content;
-    })
+    .then(d =>   d.content)
 }
 
-export {getStudents};
+function getStudentDetails (id: string | number) { 
+    return fetch(`http://localhost:8080/students/${id}`,{ method: 'GET', mode: 'cors'})
+   .then(res => res.json())
+   .then(data => {
+    return data;
+   } )  
+
+}
+
+export {getStudents, getStudentDetails};

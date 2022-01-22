@@ -17,7 +17,8 @@ type StudentDetailsProps = {
     isVisible: boolean;
     noEditMode: boolean;
     hideDialog: () => void;
-    allowEdit: () => void
+    allowEdit: () => void;
+    studentDetailedData: Product
  }
 
 const StudentDetails: React.FC<StudentDetailsProps> = props => {
@@ -38,8 +39,10 @@ const StudentDetails: React.FC<StudentDetailsProps> = props => {
     
     //const [visibleDialog, setVisibleDialog] = useState(false);   
     
-    const [product, setProduct] = useState<Product>(emptyProduct);    
-    const [submitted, setSubmitted] = useState(false);    
+    const [product, setProduct] = useState<Product>(props.studentDetailedData || emptyProduct);    
+    const [submitted, setSubmitted] = useState(false);  
+    
+    //if (props.studentDetailedData) setProduct(props.studentDetailedData)
     //const toast = useRef<Toast>(null);
     
         
@@ -192,6 +195,7 @@ const StudentDetails: React.FC<StudentDetailsProps> = props => {
         </React.Fragment>
     );
 
+    console.log (product) 
 
     return (
         <Dialog 

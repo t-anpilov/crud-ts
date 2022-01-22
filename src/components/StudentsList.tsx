@@ -11,6 +11,7 @@ import 'primeicons/primeicons.css';
 import 'primeflex/primeflex.css';
 import { Product } from '../App'  
 import StudentDetails from './StudentDetails'
+import { getStudentDetails } from '../GetStudents'
 
 interface StudentsListProps {
     students: Product []
@@ -37,6 +38,7 @@ const StudentsList: React.FC<StudentsListProps> = ({students}) => {
     const [deleteProductDialog, setDeleteProductDialog] = useState(false);
     const [deleteProductsDialog, setDeleteProductsDialog] = useState(false);  
     const [product, setProduct] = useState<Product>(emptyProduct);
+    const [currentStudent, setCurrentStudent] = useState<Product>()
     const [selectedProducts, setSelectedProducts] = useState<Product[]>([]);
     const [noEdit, setNoEdit] = useState(true);
     const [submitted, setSubmitted] = useState(false);
@@ -50,7 +52,7 @@ const StudentsList: React.FC<StudentsListProps> = ({students}) => {
         setSubmitted(false);
         setProductDialog(true);
     } 
-    const allowEditHandler = () => {
+    const allowEditHandler = () => {        
         setNoEdit(false)
     }
 
@@ -66,25 +68,14 @@ const StudentsList: React.FC<StudentsListProps> = ({students}) => {
 
     const hideDeleteProductsDialog = () => {
         setDeleteProductsDialog(false);
-    }
+    }   
     
-    
-    const getStudentDetails = (id: string | number) => fetch(`http://localhost:8080/students/${id}`, {
-        method: 'GET', mode: 'cors'
-    }) 
-        .then(res => res.json())
-        .then(data =>  {
-        console.log(data);
-        return data;
-    })  
+    const editProduct = async (product: Product) => {  
 
-    const editProduct = async (product: Product) => {
-        
-        let studentDetails = getStudentDetails(product.id)
-
-        setProduct(await studentDetails);
+        setCurrentStudent(await getStudentDetails(product.id));        
         setProductDialog(true);
     }
+    
 
     const confirmDeleteProduct = (product: Product) => {
         setProduct(product);
@@ -209,8 +200,14 @@ const StudentsList: React.FC<StudentsListProps> = ({students}) => {
                 <Column body={actionBodyTemplate} exportable={false} style={{ minWidth: '8rem', textAlign: 'right' }} bodyClassName='right_control'></Column>
             </DataTable>
 
-            <StudentDetails isVisible={productDialog} noEditMode={noEdit} hideDialog={hideDialogHandler} allowEdit={allowEditHandler}/>
-
+            {currentStudent && <StudentDetails 
+                isVisible={productDialog}
+                studentDetailedData={currentStudent}
+                noEditMode={noEdit} 
+                hideDialog={hideDialogHandler} 
+                allowEdit={allowEditHandler}/>
+            }            
+            
             <Dialog visible={deleteProductDialog} style={{ width: '450px' }} header="Confirm" modal footer={deleteProductDialogFooter} onHide={hideDeleteProductDialog}>
                 <div className="flex align-items-center justify-content-center">
                     <i className="pi pi-exclamation-triangle mr-3" style={{ fontSize: '2rem'}} />
