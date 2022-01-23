@@ -3,6 +3,7 @@ import { Calendar, CalendarChangeParams } from 'primereact/calendar'
 import { RadioButton, RadioButtonChangeParams  } from 'primereact/radiobutton'
 import { InputNumber, InputNumberChangeParams } from 'primereact/inputnumber'
 import { Dropdown, DropdownChangeParams } from 'primereact/dropdown'
+import { Checkbox, CheckboxChangeParams } from 'primereact/checkbox';
 import { Button } from 'primereact/button';
 import { Dialog } from 'primereact/dialog';
 import { InputText } from 'primereact/inputtext';
@@ -35,9 +36,7 @@ const StudentDetails: React.FC<StudentDetailsProps> = props => {
         shift: '',
         groups: []
 
-    };
-    
-    //const [visibleDialog, setVisibleDialog] = useState(false);   
+    };   
     
     const [product, setProduct] = useState<Product>(props.studentDetailedData || emptyProduct);    
     const [submitted, setSubmitted] = useState(false); 
@@ -45,9 +44,6 @@ const StudentDetails: React.FC<StudentDetailsProps> = props => {
     useEffect(() => {
        setProduct(props.studentDetailedData);
     }, [props.studentDetailedData])
-    
-    //if (props.studentDetailedData) setProduct(props.studentDetailedData)
-    //const toast = useRef<Toast>(null);
     
         
     /*const hideDialog = () => {        
@@ -97,7 +93,7 @@ const StudentDetails: React.FC<StudentDetailsProps> = props => {
         }
 
         return index;
-    }
+    }}*/
 
     const createId = () => {
         let id = '';
@@ -106,7 +102,7 @@ const StudentDetails: React.FC<StudentDetailsProps> = props => {
             id += chars.charAt(Math.floor(Math.random() * chars.length));
         }
         return id;
-    }*/
+    }
 
     // need to change to save Element function onclick for 2nd buttom
 
@@ -165,21 +161,12 @@ const StudentDetails: React.FC<StudentDetailsProps> = props => {
         setProduct(_product);        
     }
 
-    const GroupsOptions = (obj: Group[]) => {        
-        return Object.keys(obj).filter(k => typeof obj[k as any] === "number")
-    } 
-
-    const showGroup = (data: Group[]) => {
-        let result: string[] = []
-        data.forEach((group) => result.push(group.groupDescription))        
-        return result.join(', ')
-    }
-
-    const onGroupsChange = (e: DropdownChangeParams) => {
-        const val = e.target && e.target.value;
+    // need to clarify
+    const onGroupChange = (e: CheckboxChangeParams) => {
+        const val = e.value;
         let _product = {...product};        
-        if (_product.groups) {
-            _product.groups.push({id: 1000, groupDescription: val});
+        if (!e.checked && _product.groups) {
+            _product.groups.filter( group => group.id === val);
             setProduct(_product); 
         }  
     }
@@ -196,6 +183,28 @@ const StudentDetails: React.FC<StudentDetailsProps> = props => {
             <Button label="Cancel" icon="pi pi-times" className="p-button-text" onClick={props.hideDialog} />
             {props.noEditMode && <Button label="Edit" icon="pi pi-check" onClick={props.allowEdit} />}
             {!props.noEditMode && <Button label="Save" icon="pi pi-check" onClick={props.hideDialog} />} 
+        </React.Fragment>
+    );
+
+    const groupsList = (
+        <React.Fragment>
+            <div >
+            { product.groups && product.groups.map( group => {
+                return (
+                    <div className=''>  
+                    <Checkbox 
+                        id={`group1${group.id}`} 
+                        disabled={props.noEditMode}
+                        checked={true}
+                        value={group.id}
+                        onChange={(e) => onGroupChange(e)}
+                    /> 
+                    <label className="p-checkbox-label" htmlFor={`group1${group.id}`}>{`  ${group.groupDescription}`}</label>                   
+                    </div>
+                    )
+                }
+            )}
+            </div>
         </React.Fragment>
     );
 
@@ -288,16 +297,8 @@ const StudentDetails: React.FC<StudentDetailsProps> = props => {
                             placeholder='Select a shift' />
                     </div> 
                 </div>
-                <div className="field">
-                    <label htmlFor="group">Group</label>
-                    <Dropdown 
-                        id="group" 
-                        disabled={props.noEditMode}
-                        value={product.groups? showGroup(product.groups) : ''}                                                   
-                        options={GroupsOptions(product.groups!)}  
-                        onChange={(e) => onGroupsChange(e)}
-                        placeholder='Select a group' />
-                </div>
+                {groupsList}                
+                
             </Dialog>
     );
 }

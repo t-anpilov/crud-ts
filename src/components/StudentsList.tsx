@@ -115,18 +115,23 @@ const StudentsList: React.FC<StudentsListProps> = ({students}) => {
         }  
     }
 
-    const addZero = (num: number) => {
+    /*const addZero = (num: number) => {
         if (num < 10) {
             return '0' + num 
         }
          return num        
-    }
+    }*/
 
     const dateBodyTemplate = (rowData: Product) => {
         if (rowData.dateOfBirth && !Array.isArray(rowData.dateOfBirth)) {            
             let date: Date = new Date(rowData.dateOfBirth)
-            let dateArr = [addZero(date.getDate()), addZero(date.getMonth()+1), date.getFullYear()]
+            let currentDate = new Date()
+            return Math.floor((+currentDate - +date) / 31536000000)
+
+            //formatting date
+           /* let dateArr = [addZero(date.getDate()), addZero(date.getMonth()+1), date.getFullYear()]
             return <span> {`${dateArr[0]}.${dateArr[1]}.${dateArr[2]}`} </span>
+            */
         } 
     }
 
@@ -195,7 +200,7 @@ const StudentsList: React.FC<StudentsListProps> = ({students}) => {
                 <Column selectionMode="multiple" headerStyle={{ width: '3rem' }} exportable={false}></Column>
                 
                 <Column field="fullname" sortField="lastName" header="Name" body={nameBodyTemplate} sortable style={{ minWidth: '16rem' }}></Column>                
-                <Column field="dateOfBirth" header="Date Of Birth" body={dateBodyTemplate} sortable style={{ minWidth: '10rem' }}></Column> 
+                <Column field="dateOfBirth" header="Age" body={dateBodyTemplate} sortable style={{ minWidth: '10rem' }}></Column> 
                 <Column field="gender" header="Gender" body={genderBodyTemplate} sortable style={{ minWidth: '8rem' }}></Column>
                                 
                 <Column body={actionBodyTemplate} exportable={false} style={{ minWidth: '8rem', textAlign: 'right' }} bodyClassName='right_control'></Column>
