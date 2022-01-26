@@ -44,37 +44,37 @@ const StudentDetails: React.FC<StudentDetailsProps> = props => {
     }*/
     
 
-    /*const saveProduct = () => {
+    /*const saveStudent = () => {
         setSubmitted(true);
         setEditMode(true);
 
-        if (product.firstName?.trim() &&product.lastName?.trim()) {
-            let _products = [...products];
-            let _product = {...product};
-            if (product.id) {
-                const index = findIndexById(product.id);
+        if (student.firstName?.trim() &&student.lastName?.trim()) {
+            let _students = [...students];
+            let _student = {...student};
+            if (student.id) {
+                const index = findIndexById(student.id);
 
-                _products[index] = _product;
+                _students[index] = _student;
                 toast.current?.show({ severity: 'success', summary: 'Successful', detail: 'Student\'s Data Updated', life: 3000 });
             }
             else {
-                _product.id = createId();
-                _product.photoId = 'avatar2.png';
-                _products.push(_product);
+                _student.id = createId();
+                _student.photoId = 'avatar2.png';
+                _students.push(_student);
                 toast.current?.show({ severity: 'success', summary: 'Successful', detail: 'Student\'s Profile Updated', life: 3000 });
             }
 
-            setStudents(_products); // shouldn't work
-            setProductDialog(false);
-            setProduct(emptyProduct);
+            setStudents(_students); // shouldn't work
+            setStudentDialog(false);
+            setStudent(emptyStudent);
         }
     }
    
 
     const findIndexById = (id: string | number) => {
         let index = -1;
-        for (let i = 0; i < products.length; i++) {
-            if (products[i].id === id) {
+        for (let i = 0; i < students.length; i++) {
+            if (students[i].id === id) {
                 index = i;
                 break;
             }
@@ -83,6 +83,7 @@ const StudentDetails: React.FC<StudentDetailsProps> = props => {
         return index;
     }}*/
 
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const createId = () => {
         let id = '';
         let chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
@@ -149,14 +150,17 @@ const StudentDetails: React.FC<StudentDetailsProps> = props => {
         setStudent(_student);        
     }
 
-    // need to clarify
+    // need to clarify, better change from checkbox to use buttons or disable editing inside
     const onGroupChange = (e: CheckboxChangeParams) => {
-        const val = e.value;
-        let _student = {...student};        
-        if (!e.checked && _student.groups) {
-            _student.groups.filter( group => group.id === val);
+        
+        //no need to update inside component:
+        /*const val = e.value;
+        let _student = {...student};
+        
+        if (_student.groups) {
+            _student.groups =[..._student.groups.filter( group => group.id === val)];
             setStudent(_student); 
-        }  
+        }  */
     }
 
     const onInsuranceChange = (e: RadioButtonChangeParams) => {
@@ -179,9 +183,9 @@ const StudentDetails: React.FC<StudentDetailsProps> = props => {
             <div >
             { student.groups && student.groups.map( group => {
                 return (
-                    <div className=''>  
+                    <div className='col-12'>  
                     <Checkbox 
-                        id={`group1${group.id}`} 
+                        inputId={`group1${group.id}`} 
                         disabled={props.noEditMode}
                         checked={true}
                         value={group.id}
@@ -281,7 +285,7 @@ const StudentDetails: React.FC<StudentDetailsProps> = props => {
                             disabled={props.noEditMode}
                             value={student.shift}                                                                     
                             options={ShiftOptions}  
-                            onChange={(e) => onShiftChange(e)}
+                            onChange={e => onShiftChange(e)}
                             placeholder='Select a shift' />
                     </div> 
                 </div>
