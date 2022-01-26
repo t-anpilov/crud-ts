@@ -6,7 +6,7 @@ import 'primeicons/primeicons.css';
 import 'primeflex/primeflex.css';
 import StudentsList from './components/StudentsList'
  
-export interface Product {
+export interface Student {
     id: string | number;
     firstName: string;
     lastName: string;
@@ -25,7 +25,7 @@ export type Shifts = "FIRST" | "SECOND" | ""
 
 const App: React.FC = () => {    
 
-    const [studentsData, setStudentsData] = useState<Product[]>([]);
+    const [studentsData, setStudentsData] = useState<Student[]>([]);
     
 
     useEffect(() => {

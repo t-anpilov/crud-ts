@@ -9,37 +9,39 @@ import 'primereact/resources/themes/saga-blue/theme.css';
 import 'primereact/resources/primereact.min.css';
 import 'primeicons/primeicons.css';
 import 'primeflex/primeflex.css';
-import { Product } from '../App'  
+import { Student } from '../App'  
 import StudentDetails from './StudentDetails'
 import { getStudentDetails } from '../GetStudents'
 
 interface StudentsListProps {
-    students: Product []
+    students: Student []
 }
 
+export const emptyStudent: Student = {
+    id: '',
+    firstName: '',
+    lastName: '',
+    middleName: '',
+    dateOfBirth: new Date(),
+    gender: '',
+    photoId: null,
+    insurance: false,
+    school: '',
+    shift: '',
+    groups: []
+
+};
+
 const StudentsList: React.FC<StudentsListProps> = ({students}) => {
-    let emptyProduct: Product = {
-        id: '',
-        firstName: '',
-        lastName: '',
-        middleName: '',
-        dateOfBirth: new Date(),
-        gender: '',
-        photoId: null,
-        insurance: false,
-        school: '',
-        shift: '',
-        groups: []
+    
 
-    };
-
-    const [studentsList, setStudentsList] = useState<Product[]>([]);
-    const [productDialog, setProductDialog] = useState(false);
-    const [deleteProductDialog, setDeleteProductDialog] = useState(false);
-    const [deleteProductsDialog, setDeleteProductsDialog] = useState(false);  
-    const [product, setProduct] = useState<Product>(emptyProduct);
-    const [currentStudent, setCurrentStudent] = useState<Product>()
-    const [selectedProducts, setSelectedProducts] = useState<Product[]>([]);
+    const [studentsList, setStudentsList] = useState<Student[]>([]);
+    const [studentDialog, setStudentDialog] = useState(false);
+    const [deleteStudentDialog, setDeleteStudentDialog] = useState(false);
+    const [deleteStudentsDialog, setDeleteStudentsDialog] = useState(false);  
+    const [student, setStudent] = useState<Student>(emptyStudent);
+    const [currentStudent, setCurrentStudent] = useState<Student>()
+    const [selectedStudents, setSelectedStudents] = useState<Student[]>([]);
     const [noEdit, setNoEdit] = useState(true);
     const [submitted, setSubmitted] = useState(false);
     const [globalFilter, setGlobalFilter] = useState<string>();
@@ -48,68 +50,68 @@ const StudentsList: React.FC<StudentsListProps> = ({students}) => {
     
     
     const openNew = () => {
-        setCurrentStudent(emptyProduct);
+        setCurrentStudent(emptyStudent);
         setSubmitted(false);
-        setProductDialog(true);
+        setStudentDialog(true);
     } 
     const allowEditHandler = () => {        
         setNoEdit(false)
     }
 
     const hideDialogHandler = () => {
-        setProductDialog(false)
+        setStudentDialog(false)
         setSubmitted(false);                
         setNoEdit(true)
     }    
 
-    const hideDeleteProductDialog = () => {
-        setDeleteProductDialog(false);
+    const hideDeleteStudentDialog = () => {
+        setDeleteStudentDialog(false);
     }
 
-    const hideDeleteProductsDialog = () => {
-        setDeleteProductsDialog(false);
+    const hideDeleteStudentsDialog = () => {
+        setDeleteStudentsDialog(false);
     }   
     
-    const editProduct = async (product: Product) => {  
-        let _currentStudent = await getStudentDetails(product.id)
+    const editStudent = async (student: Student) => {  
+        let _currentStudent = await getStudentDetails(student.id)
         setCurrentStudent({..._currentStudent});        
-        setProductDialog(true);
+        setStudentDialog(true);
     }
     
 
-    const confirmDeleteProduct = (product: Product) => {
-        setProduct(product);
-        setDeleteProductDialog(true);
+    const confirmDeleteStudent = (student: Student) => {
+        setStudent(student);
+        setDeleteStudentDialog(true);
     }
   // q if we need
-    const deleteProduct = () => {
-        let _products : Product []
+    const deleteStudent = () => {
+        let _students : Student []
         if (Array.isArray(students)) {
-            _products = students.filter((val: { id: string | number; }) => val.id !== product.id);
-            setStudentsList(_products); 
-        setDeleteProductDialog(false);
-        setProduct(emptyProduct);
+            _students = students.filter((val: { id: string | number; }) => val.id !== student.id);
+            setStudentsList(_students); 
+        setDeleteStudentDialog(false);
+        setStudent(emptyStudent);
         toast.current?.show({ severity: 'success', summary: 'Successful', detail: 'Student Removed', life: 3000 });
         } 
     }
 
     const confirmDeleteSelected = () => {
-        setDeleteProductsDialog(true);
+        setDeleteStudentsDialog(true);
     }
 
-    const deleteSelectedProducts = () => {
-        let _products : Product []
+    const deleteSelectedStudents = () => {
+        let _students : Student []
         if (Array.isArray(students)) {
-            _products = students.filter((val: Product) => !selectedProducts.includes(val));
-            setStudentsList(_products);
-            setDeleteProductsDialog(false);
-            setSelectedProducts([]);
-            toast.current?.show({ severity: 'success', summary: 'Successful', detail: 'Products Deleted', life: 3000 });
+            _students = students.filter((val: Student) => !selectedStudents.includes(val));
+            setStudentsList(_students);
+            setDeleteStudentsDialog(false);
+            setSelectedStudents([]);
+            toast.current?.show({ severity: 'success', summary: 'Successful', detail: 'Students Deleted', life: 3000 });
         }
         console.log (studentsList) // checking rempve function
     }    
 
-    const nameBodyTemplate = (rowData: Product) => {
+    const nameBodyTemplate = (rowData: Student) => {
         if(rowData.firstName && rowData.lastName && rowData.middleName) {
             return <span> {`${rowData.lastName} ${rowData.firstName} ${rowData.middleName}`} </span>
         }  
@@ -122,7 +124,7 @@ const StudentsList: React.FC<StudentsListProps> = ({students}) => {
          return num        
     }*/
 
-    const dateBodyTemplate = (rowData: Product) => {
+    const dateBodyTemplate = (rowData: Student) => {
         if (rowData.dateOfBirth && !Array.isArray(rowData.dateOfBirth)) {            
             let date: Date = new Date(rowData.dateOfBirth)
             let currentDate = new Date()
@@ -135,7 +137,7 @@ const StudentsList: React.FC<StudentsListProps> = ({students}) => {
         } 
     }
 
-    const genderBodyTemplate = (rowData: Product) => {
+    const genderBodyTemplate = (rowData: Student) => {
         if (rowData.gender) {
             let text = rowData.gender
             return <span> {text[0] + text.slice(1).toLowerCase()} </span>
@@ -143,11 +145,11 @@ const StudentsList: React.FC<StudentsListProps> = ({students}) => {
     }
 
     // there is action to open details
-    const actionBodyTemplate = (rowData: Product) => {
+    const actionBodyTemplate = (rowData: Student) => {
         return (
             <React.Fragment>
-                <Button icon="pi pi-pencil" className="p-button-rounded p-button-success mr-2" onClick={() => editProduct(rowData)} />
-                <Button icon="pi pi-trash" className="p-button-rounded p-button-danger" onClick={() => confirmDeleteProduct(rowData)} />
+                <Button icon="pi pi-pencil" className="p-button-rounded p-button-success mr-2" onClick={() => editStudent(rowData)} />
+                <Button icon="pi pi-trash" className="p-button-rounded p-button-danger" onClick={() => confirmDeleteStudent(rowData)} />
             </React.Fragment>
         );
     }
@@ -160,23 +162,23 @@ const StudentsList: React.FC<StudentsListProps> = ({students}) => {
             </span>
             <div className="mt-3 md:mt-0 flex justify-content-end">
                 <Button icon="pi pi-plus" className="mr-2 p-button-rounded" onClick={openNew} tooltip="New" tooltipOptions={{position: 'bottom'}} />
-                <Button icon="pi pi-trash" className="p-button-danger mr-2 p-button-rounded" onClick={confirmDeleteSelected} disabled={!selectedProducts || !selectedProducts.length} tooltip="Delete" tooltipOptions={{position: 'bottom'}} />
+                <Button icon="pi pi-trash" className="p-button-danger mr-2 p-button-rounded" onClick={confirmDeleteSelected} disabled={!selectedStudents || !selectedStudents.length} tooltip="Delete" tooltipOptions={{position: 'bottom'}} />
                 
             </div>
         </div>
     );    
 
-    const deleteProductDialogFooter = (
+    const deleteStudentDialogFooter = (
         <React.Fragment>
-            <Button label="No" icon="pi pi-times" className="p-button-text" onClick={hideDeleteProductDialog} />
-            <Button label="Yes" icon="pi pi-check" className="p-button-text" onClick={deleteProduct} />
+            <Button label="No" icon="pi pi-times" className="p-button-text" onClick={hideDeleteStudentDialog} />
+            <Button label="Yes" icon="pi pi-check" className="p-button-text" onClick={deleteStudent} />
         </React.Fragment>
     );
 
-    const deleteProductsDialogFooter = (
+    const deleteStudentsDialogFooter = (
         <React.Fragment>
-            <Button label="No" icon="pi pi-times" className="p-button-text" onClick={hideDeleteProductsDialog} />
-            <Button label="Yes" icon="pi pi-check" className="p-button-text" onClick={deleteSelectedProducts} />
+            <Button label="No" icon="pi pi-times" className="p-button-text" onClick={hideDeleteStudentsDialog} />
+            <Button label="Yes" icon="pi pi-check" className="p-button-text" onClick={deleteSelectedStudents} />
         </React.Fragment>
     );
 
@@ -191,12 +193,12 @@ const StudentsList: React.FC<StudentsListProps> = ({students}) => {
             <div className="text-3xl text-800 font-bold mb-4">STUDENTS</div>
 
             
-            <DataTable ref={dt} value={ students} selection={selectedProducts} onSelectionChange={(e) => setSelectedProducts(e.value)}
+            <DataTable ref={dt} value={ students} selection={selectedStudents} onSelectionChange={(e) => setSelectedStudents(e.value)}
                 dataKey="id" paginator rows={10} rowsPerPageOptions={[5, 10, 25]}
                 paginatorTemplate="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink CurrentPageReport RowsPerPageDropdown"
-                currentPageReportTemplate="Showing {first} to {last} of {totalRecords} products"
+                currentPageReportTemplate="Showing {first} to {last} of {totalRecords} students"
                 globalFilter={globalFilter} header={header} responsiveLayout="scroll"
-                onRowDoubleClick={(e) => editProduct(e.data)}>
+                onRowDoubleClick={(e) => editStudent(e.data)}>
                 <Column selectionMode="multiple" headerStyle={{ width: '3rem' }} exportable={false}></Column>
                 
                 <Column field="fullname" sortField="lastName" header="Name" body={nameBodyTemplate} sortable style={{ minWidth: '16rem' }}></Column>                
@@ -207,24 +209,24 @@ const StudentsList: React.FC<StudentsListProps> = ({students}) => {
             </DataTable>
 
             {currentStudent && <StudentDetails 
-                isVisible={productDialog}
+                isVisible={studentDialog}
                 studentDetailedData={currentStudent}
                 noEditMode={noEdit} 
                 hideDialog={hideDialogHandler} 
                 allowEdit={allowEditHandler}/>
             }            
             
-            <Dialog visible={deleteProductDialog} style={{ width: '450px' }} header="Confirm" modal footer={deleteProductDialogFooter} onHide={hideDeleteProductDialog}>
+            <Dialog visible={deleteStudentDialog} style={{ width: '450px' }} header="Confirm" modal footer={deleteStudentDialogFooter} onHide={hideDeleteStudentDialog}>
                 <div className="flex align-items-center justify-content-center">
                     <i className="pi pi-exclamation-triangle mr-3" style={{ fontSize: '2rem'}} />
-                    {product && <span>Are you sure you want to remove?<b>{product.firstName + product.lastName}</b>?</span>}
+                    {student && <span>Are you sure you want to remove?<b>{student.firstName + student.lastName}</b>?</span>}
                 </div>
             </Dialog>
 
-            <Dialog visible={deleteProductsDialog} style={{ width: '450px' }} header="Confirm" modal footer={deleteProductsDialogFooter} onHide={hideDeleteProductsDialog}>
+            <Dialog visible={deleteStudentsDialog} style={{ width: '450px' }} header="Confirm" modal footer={deleteStudentsDialogFooter} onHide={hideDeleteStudentsDialog}>
                 <div className="flex align-items-center justify-content-center">
                     <i className="pi pi-exclamation-triangle mr-3" style={{ fontSize: '2rem'}} />
-                    {product && <span>Are you sure you want to remove the selected students?</span>}
+                    {student && <span>Are you sure you want to remove the selected students?</span>}
                 </div>
             </Dialog>   
         </div>

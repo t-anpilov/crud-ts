@@ -12,37 +12,25 @@ import 'primereact/resources/themes/saga-blue/theme.css';
 import 'primereact/resources/primereact.min.css';
 import 'primeicons/primeicons.css';
 import 'primeflex/primeflex.css';
-import { Product, Shifts, Group } from '../App'  
+import { Student, Shifts } from '../App'  
+import { emptyStudent } from './StudentsList'
 
 type StudentDetailsProps = { 
     isVisible: boolean;
     noEditMode: boolean;
     hideDialog: () => void;
     allowEdit: () => void;
-    studentDetailedData: Product
+    studentDetailedData: Student
  }
 
 const StudentDetails: React.FC<StudentDetailsProps> = props => {
-    let emptyProduct: Product = {
-        id: '',
-        firstName: '',
-        lastName: '',
-        middleName: '',
-        dateOfBirth: new Date(),
-        gender: '',
-        photoId: null,
-        insurance: false,
-        school: '',
-        shift: '',
-        groups: []
-
-    };   
+      
     
-    const [product, setProduct] = useState<Product>(props.studentDetailedData || emptyProduct);    
+    const [student, setStudent] = useState<Student>(props.studentDetailedData || emptyStudent);    
     const [submitted, setSubmitted] = useState(false); 
     
     useEffect(() => {
-       setProduct(props.studentDetailedData);
+       setStudent(props.studentDetailedData);
     }, [props.studentDetailedData])
     
         
@@ -107,22 +95,22 @@ const StudentDetails: React.FC<StudentDetailsProps> = props => {
     // need to change to save Element function onclick for 2nd buttom
 
     const onGenderSet = (e: RadioButtonChangeParams) => {
-        let _product = {...product};
-        _product['gender'] = e.value;
-        setProduct(_product);
+        let _student = {...student};
+        _student['gender'] = e.value;
+        setStudent(_student);
     }
 
     const onNameChange = (e: ChangeEvent<HTMLInputElement>, prop: 'firstName'|'lastName'|'middleName') => {
         const val = (e.target && e.target.value) || '';
-        let _product: Product = {...product};
+        let _student: Student = {...student};
         if (prop === 'firstName') {
-            _product.firstName = val;
+            _student.firstName = val;
         } else if (prop === 'lastName') {
-            _product.lastName = val;
+            _student.lastName = val;
         } else if (prop === 'middleName') {
-            _product.middleName = val;
+            _student.middleName = val;
         }    
-        setProduct(_product);
+        setStudent(_student);
     } 
     
     const getNumber = (str: string):number => {
@@ -138,17 +126,17 @@ const StudentDetails: React.FC<StudentDetailsProps> = props => {
     
     const onSchoolChange = (e: InputNumberChangeParams) => {
         const val = e && e.value;
-        let _product = {...product};
-        _product.school =  '#' + val;
-        setProduct(_product);
+        let _student = {...student};
+        _student.school =  '#' + val;
+        setStudent(_student);
     }
 
     const onDateChange = (e: CalendarChangeParams) => {
         if (e.target.value!==null)   {
             const val = (e.target && e.target.value);
-            let _product = {...product};
-            if (val) _product.dateOfBirth = val;
-            setProduct(_product);
+            let _student = {...student};
+            if (val) _student.dateOfBirth = val;
+            setStudent(_student);
         }  
     }
 
@@ -156,29 +144,29 @@ const StudentDetails: React.FC<StudentDetailsProps> = props => {
 
     const onShiftChange = (e: DropdownChangeParams) => {
         const val = e.target && e.target.value;
-        let _product = {...product};        
-        _product.shift = val;   
-        setProduct(_product);        
+        let _student = {...student};        
+        _student.shift = val;   
+        setStudent(_student);        
     }
 
     // need to clarify
     const onGroupChange = (e: CheckboxChangeParams) => {
         const val = e.value;
-        let _product = {...product};        
-        if (!e.checked && _product.groups) {
-            _product.groups.filter( group => group.id === val);
-            setProduct(_product); 
+        let _student = {...student};        
+        if (!e.checked && _student.groups) {
+            _student.groups.filter( group => group.id === val);
+            setStudent(_student); 
         }  
     }
 
     const onInsuranceChange = (e: RadioButtonChangeParams) => {
-        let _product = {...product};
-        _product['insurance'] = e.value;
-        setProduct(_product);
+        let _student = {...student};
+        _student['insurance'] = e.value;
+        setStudent(_student);
     }    
 
 
-    const productDialogFooter = (
+    const studentDialogFooter = (
         <React.Fragment>            
             <Button label="Cancel" icon="pi pi-times" className="p-button-text" onClick={props.hideDialog} />
             {props.noEditMode && <Button label="Edit" icon="pi pi-check" onClick={props.allowEdit} />}
@@ -189,7 +177,7 @@ const StudentDetails: React.FC<StudentDetailsProps> = props => {
     const groupsList = (
         <React.Fragment>
             <div >
-            { product.groups && product.groups.map( group => {
+            { student.groups && student.groups.map( group => {
                 return (
                     <div className=''>  
                     <Checkbox 
@@ -215,32 +203,32 @@ const StudentDetails: React.FC<StudentDetailsProps> = props => {
             style={{width: '40vw'}} 
             header="Student Profile" 
             modal className="p-fluid" 
-            footer={productDialogFooter} 
+            footer={studentDialogFooter} 
             onHide={props.hideDialog}>
-                {product.photoId && <img 
-                    src={`demo/images/prvisibleDialog,duct/${product.photoId}`} 
-                    alt={product.photoId} 
+                {student.photoId && <img 
+                    src={`demo/images/${student.photoId}`} 
+                    alt={student.photoId} 
                     className="block mt-0 mx-auto mb-5 w-12rem shadow-2" 
                 />}
-                {product.photoId===null && <img 
-                    src='demo/images/product/avatar2.png' 
+                {student.photoId===null && <img 
+                    src='demo/images/avatar2.png' 
                     alt='noPhoto'
                     className="block mt-0 mx-auto mb-5 w-12rem shadow-2" 
                 />}
                 <div className="field">
                     <label htmlFor="firstName">First Name</label>
-                    <InputText id="firstName" disabled={props.noEditMode} value={product.firstName} onChange={(e) => onNameChange(e, 'firstName')} required className={classNames({ 'p-invalid': submitted && !product.firstName })} />
-                    {submitted && !product.firstName && <small className="p-error">Name is required.</small>}
+                    <InputText id="firstName" disabled={props.noEditMode} value={student.firstName} onChange={(e) => onNameChange(e, 'firstName')} required className={classNames({ 'p-invalid': submitted && !student.firstName })} />
+                    {submitted && !student.firstName && <small className="p-error">Name is required.</small>}
                 </div>
                 <div className="field">
                     <label htmlFor="middleName">Middle Name</label>
-                    <InputText id="middleName" disabled={props.noEditMode} value={product.middleName} onChange={(e) => onNameChange(e, 'middleName')} required className={classNames({ 'p-invalid': submitted && !product.middleName })} />
-                    {submitted && !product.middleName && <small className="p-error">Name is required.</small>}
+                    <InputText id="middleName" disabled={props.noEditMode} value={student.middleName} onChange={(e) => onNameChange(e, 'middleName')} required className={classNames({ 'p-invalid': submitted && !student.middleName })} />
+                    {submitted && !student.middleName && <small className="p-error">Name is required.</small>}
                 </div>
                 <div className="field">
                     <label htmlFor="lastName">Last Name</label>
-                    <InputText id="lastName" disabled={props.noEditMode} value={product.lastName} onChange={(e) => onNameChange(e, 'lastName')} required className={classNames({ 'p-invalid': submitted && !product.lastName })} />
-                    {submitted && !product.lastName && <small className="p-error">Name is required.</small>}
+                    <InputText id="lastName" disabled={props.noEditMode} value={student.lastName} onChange={(e) => onNameChange(e, 'lastName')} required className={classNames({ 'p-invalid': submitted && !student.lastName })} />
+                    {submitted && !student.lastName && <small className="p-error">Name is required.</small>}
                 </div>
 
                 <div className="formgrid grid">
@@ -249,7 +237,7 @@ const StudentDetails: React.FC<StudentDetailsProps> = props => {
                         <Calendar 
                             id="date" 
                             disabled={props.noEditMode}
-                            value={product.dateOfBirth ? new Date(product.dateOfBirth.toString()) : undefined} 
+                            value={student.dateOfBirth ? new Date(student.dateOfBirth.toString()) : undefined} 
                             dateFormat="dd.mm.yy" 
                             monthNavigator yearNavigator yearRange="1980:2025"
                             onChange={(e) => onDateChange(e)} />
@@ -257,22 +245,22 @@ const StudentDetails: React.FC<StudentDetailsProps> = props => {
                     <div className="field col">
                         <label className="mb-3">Gender</label>
                         <div className="field-radiobutton col-4">
-                            <RadioButton disabled={props.noEditMode} inputId="gender1" name="gender" value="Female" onChange={onGenderSet} checked={product.gender === 'FEMALE'}  />
+                            <RadioButton disabled={props.noEditMode} inputId="gender1" name="gender" value="Female" onChange={onGenderSet} checked={student.gender === 'FEMALE'}  />
                             <label htmlFor="gender1">Female</label>
                         </div>
                         <div className="field-radiobutton col-4">
-                            <RadioButton disabled={props.noEditMode} inputId="gender2" name="gender" value="Male" onChange={onGenderSet} checked={product.gender === 'MALE'} />
+                            <RadioButton disabled={props.noEditMode} inputId="gender2" name="gender" value="Male" onChange={onGenderSet} checked={student.gender === 'MALE'} />
                             <label htmlFor="gender2">Male</label>
                         </div>                        
                     </div>
                     <div className="field col">
                     <label className="mb-3">Insurance</label>
                         <div className="field-radiobutton col-6">
-                            <RadioButton disabled={props.noEditMode} inputId="insurance1" name="insurance" onChange={onInsuranceChange} checked={product.insurance === true} />
+                            <RadioButton disabled={props.noEditMode} inputId="insurance1" name="insurance" onChange={onInsuranceChange} checked={student.insurance === true} />
                             <label htmlFor="insurance1">Yes</label>
                         </div>
                         <div className="field-radiobutton col-6">
-                            <RadioButton disabled={props.noEditMode} inputId="insurance2" name="insurance" onChange={onInsuranceChange} checked={product.insurance === false} />
+                            <RadioButton disabled={props.noEditMode} inputId="insurance2" name="insurance" onChange={onInsuranceChange} checked={student.insurance === false} />
                             <label htmlFor="insurance2">No</label>
                         </div>                        
                     </div>
@@ -282,8 +270,8 @@ const StudentDetails: React.FC<StudentDetailsProps> = props => {
                 <div className="formgrid grid">  
                     <div className="field col">
                         <label htmlFor="school">School</label>
-                        <InputNumber disabled={props.noEditMode} id="school" value={getNumber(product.school!)} onChange={(e) => onSchoolChange(e)} required className={classNames({ 'p-invalid': submitted && !product.school })} />
-                        {submitted && !product.lastName && <small className="p-error">Number is required.</small>}
+                        <InputNumber disabled={props.noEditMode} id="school" value={getNumber(student.school!)} onChange={(e) => onSchoolChange(e)} required className={classNames({ 'p-invalid': submitted && !student.school })} />
+                        {submitted && !student.lastName && <small className="p-error">Number is required.</small>}
                     </div>                   
                     
                     <div className="field col">
@@ -291,7 +279,7 @@ const StudentDetails: React.FC<StudentDetailsProps> = props => {
                         <Dropdown 
                             id="shift" 
                             disabled={props.noEditMode}
-                            value={product.shift}                                                                     
+                            value={student.shift}                                                                     
                             options={ShiftOptions}  
                             onChange={(e) => onShiftChange(e)}
                             placeholder='Select a shift' />
