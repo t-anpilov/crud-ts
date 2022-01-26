@@ -183,8 +183,7 @@ const StudentsList: React.FC<StudentsListProps> = ({students}) => {
     );
 
     
-    //console.log (students) 
-    console.log ('state variable', currentStudent) 
+    
 
     return (
         <div className="datatable-crud-demo surface-card p-4 border-round shadow-2">
