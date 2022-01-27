@@ -7,6 +7,7 @@ import 'primeicons/primeicons.css';
 import 'primeflex/primeflex.css';
 import StudentsList from './components/StudentsList'
 import GroupsList from './components/GroupsList';
+import './app.css'
  
 export interface Student {
     id: string | number;
@@ -41,7 +42,7 @@ const App: React.FC = () => {
 
 
     return (
-        <div>
+        <div className="flex_container">
             <GroupsList groups={groupsData}/>
            <StudentsList students={studentsData} />
         </div>  

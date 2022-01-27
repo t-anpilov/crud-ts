@@ -1,0 +1,7 @@
+.flex_container {
+    display: flex;
+    justify-content: space-around;
+}
+.flex_container > div {
+    flex-basis: 40%;
+}

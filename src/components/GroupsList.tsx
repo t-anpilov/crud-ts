@@ -70,7 +70,7 @@ const GroupsList: React.FC<GroupsListProps> = ({groups}) => {
             <div className="text-3xl text-800 font-bold mb-4">GROUPS</div>
             
             <DataTable ref={dt} value={groups} selection={selectedGroups} onSelectionChange={(e) => setSelectedGroups(e.value)}
-                dataKey="id" paginator rows={5} rowsPerPageOptions={[5, 10]}
+                dataKey="id"
                 paginatorTemplate="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink CurrentPageReport RowsPerPageDropdown"
                 currentPageReportTemplate="Showing {first} to {last} of {totalRecords} groups"
                 globalFilter={globalFilter} header={header} responsiveLayout="scroll" >
