@@ -5,3 +5,7 @@
 .flex_container > div {
     flex-basis: 40%;
 }
+
+li {
+    list-style-type: none;
+}

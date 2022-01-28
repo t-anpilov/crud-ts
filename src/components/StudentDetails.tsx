@@ -3,7 +3,6 @@ import { Calendar, CalendarChangeParams } from 'primereact/calendar'
 import { RadioButton, RadioButtonChangeParams  } from 'primereact/radiobutton'
 import { InputNumber, InputNumberChangeParams } from 'primereact/inputnumber'
 import { Dropdown, DropdownChangeParams } from 'primereact/dropdown'
-import { Checkbox, CheckboxChangeParams } from 'primereact/checkbox';
 import { Button } from 'primereact/button';
 import { Dialog } from 'primereact/dialog';
 import { InputText } from 'primereact/inputtext';
@@ -150,19 +149,6 @@ const StudentDetails: React.FC<StudentDetailsProps> = props => {
         setStudent(_student);        
     }
 
-    // need to clarify, better change from checkbox to use buttons or disable editing inside
-    const onGroupChange = (e: CheckboxChangeParams) => {
-        
-        //no need to update inside component:
-        /*const val = e.value;
-        let _student = {...student};
-        
-        if (_student.groups) {
-            _student.groups =[..._student.groups.filter( group => group.id === val)];
-            setStudent(_student); 
-        }  */
-    }
-
     const onInsuranceChange = (e: RadioButtonChangeParams) => {
         let _student = {...student};
         _student['insurance'] = e.value;
@@ -180,22 +166,13 @@ const StudentDetails: React.FC<StudentDetailsProps> = props => {
 
     const groupsList = (
         <React.Fragment>
-            <div >
-            { student.groups && student.groups.map( group => {
-                return (
-                    <div className='col-12'>  
-                    <Checkbox 
-                        inputId={`group1${group.id}`} 
-                        disabled={props.noEditMode}
-                        checked={true}
-                        value={group.id}
-                        onChange={(e) => onGroupChange(e)}
-                    /> 
-                    <label className="p-checkbox-label" htmlFor={`group1${group.id}`}>{`  ${group.groupDescription}`}</label>                   
-                    </div>
-                    )
-                }
-            )}
+            <div className='col'>
+                <div> List of groups: </div>
+                <ul className='col-12'>
+                    { student.groups && student.groups.map( group => {
+                        return  <li>{`${group.groupDescription}, ID:${group.id}`}</li>
+                    }) }    
+                </ul>
             </div>
         </React.Fragment>
     );
