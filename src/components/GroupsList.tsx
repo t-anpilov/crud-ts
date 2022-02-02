@@ -1,5 +1,5 @@
 import React, { useState, useRef, FormEvent } from 'react';
-import { DataTable } from 'primereact/datatable';
+import { DataTable, DataTableSelectParams } from 'primereact/datatable';
 import { Column } from 'primereact/column';
 import { Toast } from 'primereact/toast';
 import { Button } from 'primereact/button';
@@ -10,21 +10,24 @@ import 'primereact/resources/primereact.min.css';
 import 'primeicons/primeicons.css';
 import 'primeflex/primeflex.css';
 import { Group } from '../App'
+import { RadioButtonChangeParams } from 'primereact/radiobutton';
 
 interface GroupsListProps {
-    groups: Group []
+    groups: Group [];
+    showMembersAtList: (e: DataTableSelectParams) => void
+    showAllMembersAtList: () => void
 }
 
-const GroupsList: React.FC<GroupsListProps> = ({groups}) => {
+const GroupsList: React.FC<GroupsListProps> = props => {
 
     const emptyGroup = {id: '', groupDescription: ''}
 
     
     const [groupDialog, setGroupDialog] = useState(false);
     const [globalFilter, setGlobalFilter] = useState<string>();
-    const [selectedGroups, setSelectedGroups] = useState<Group[]>([]);
+    const [selectedGroup, setSelectedGroup] = useState<Group>(emptyGroup);
     const [deleteGroupDialog, setDeleteGroupDialog] = useState(false);
-    const [deleteGroupsDialog, setDeleteGroupsDialog] = useState(false);
+    
     const [currentGroup, setCurrentGroup] = useState<Group>(); 
     const [submitted, setSubmitted] = useState(false);
     const toast = useRef<Toast>(null);
@@ -36,9 +39,6 @@ const GroupsList: React.FC<GroupsListProps> = ({groups}) => {
         setGroupDialog(true);
     } 
 
-    const confirmDeleteSelected = () => {
-        setDeleteGroupsDialog(true);
-    }
 
     const header = (
         <div className="flex flex-column md:flex-row md:align-items-center justify-content-between">
@@ -48,8 +48,7 @@ const GroupsList: React.FC<GroupsListProps> = ({groups}) => {
             </span>
             <div className="mt-3 md:mt-0 flex justify-content-end">
                 <Button icon="pi pi-plus" className="mr-2 p-button-rounded" onClick={createGroup} tooltip="New" tooltipOptions={{position: 'bottom'}} />
-                <Button icon="pi pi-trash" className="p-button-danger mr-2 p-button-rounded" onClick={confirmDeleteSelected} disabled={!selectedGroups || !selectedGroups.length} tooltip="Delete" tooltipOptions={{position: 'bottom'}} />
-                
+                                
             </div>
         </div>
     ); 
@@ -69,15 +68,18 @@ const GroupsList: React.FC<GroupsListProps> = ({groups}) => {
 
             <div className="text-3xl text-800 font-bold mb-4">GROUPS</div>
             
-            <DataTable ref={dt} value={groups} selection={selectedGroups} onSelectionChange={(e) => setSelectedGroups(e.value)}
+            <DataTable ref={dt} value={props.groups} selection={selectedGroup} onSelectionChange={(e) => setSelectedGroup(e.value)}
                 dataKey="id"
                 paginatorTemplate="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink CurrentPageReport RowsPerPageDropdown"
                 currentPageReportTemplate="Showing {first} to {last} of {totalRecords} groups"
-                globalFilter={globalFilter} header={header} responsiveLayout="scroll" >
-                <Column selectionMode="multiple" headerStyle={{ width: '3rem' }} exportable={false}></Column>
+                globalFilter={globalFilter} header={header} responsiveLayout="scroll" 
+                onRowSelect={(e: DataTableSelectParams ) => props.showMembersAtList(e)}
+                onRowUnselect={props.showAllMembersAtList}>
+                
+                <Column selectionMode="single" headerStyle={{ width: '3rem' }} exportable={false}></Column>
                 
                 <Column field="id" header="ID"  sortable style={{ minWidth: '4rem' }}></Column>                
-                <Column field="groupDescription" header="Name" sortable style={{ minWidth: '20rem' }}></Column>                 
+                <Column field="groupDescription" header="Name" sortable style={{ minWidth: '10rem' }}></Column>                 
                                 
                 <Column body={actionBodyTemplate} exportable={false} style={{ minWidth: '8rem', textAlign: 'right' }} bodyClassName='right_control'></Column>
             </DataTable>

@@ -6,4 +6,12 @@ function getGroups() {
     .then(d =>   d.content)
 }
 
-export {getGroups};
+function getGroupsMembers(id: string | number) {
+    return fetch(`http://localhost:8080/groups/${id}/students`, {
+        method: 'GET',
+        mode: 'cors'})    
+    .then(res => res.json())
+    .then(d => d.content)
+}
+
+export {getGroups, getGroupsMembers};

@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
+import { DataTableSelectParams } from 'primereact/datatable';
 import { getStudents } from './GetStudents';
-import { getGroups } from './getGroups'
+import { getGroups, getGroupsMembers } from './getGroups'
 import 'primereact/resources/themes/saga-blue/theme.css';
 import 'primereact/resources/primereact.min.css';
 import 'primeicons/primeicons.css';
@@ -15,15 +16,20 @@ export interface Student {
     lastName: string;
     middleName: string;
     photoId?: string | null;
-    gender: string;
-    dateOfBirth: Date | Date[];
-    insurance?: boolean;
+    gender?: string;
+    dateOfBirth?: Date | Date[];
+    insurance?: boolean | null;
     school?: string;
     shift?: Shifts;
     groups?: Group[]
 }
 
-export type Group = {id: string | number, groupDescription: string}
+export type Group = {
+    id: string | number,
+    groupDescription: string,
+    members?: Student[]
+}
+
 export type Shifts = "FIRST" | "SECOND" | ""
 
 const App: React.FC = () => {    
@@ -40,11 +46,22 @@ const App: React.FC = () => {
         getGroups().then(data => setGroupsData(data));
     }, []);
 
+    const studentsListHandler = (e: DataTableSelectParams) => {
+        getGroupsMembers(e.data.id).then(data => setStudentsData(data))
+    }
+
+    const studentsAllListHandler = () => {
+        
+        getStudents().then(data => setStudentsData(data))
+    }
 
     return (
         <div className="flex_container">
-            <GroupsList groups={groupsData}/>
-           <StudentsList students={studentsData} />
+            <GroupsList 
+                groups={groupsData} 
+                showMembersAtList={studentsListHandler}
+                showAllMembersAtList={studentsAllListHandler}/>
+            <StudentsList students={studentsData} />
         </div>  
     );
 }

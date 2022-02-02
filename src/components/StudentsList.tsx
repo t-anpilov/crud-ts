@@ -22,10 +22,9 @@ export const emptyStudent: Student = {
     firstName: '',
     lastName: '',
     middleName: '',
-    dateOfBirth: new Date(),
     gender: '',
     photoId: null,
-    insurance: false,
+    insurance: null,
     school: '',
     shift: '',
     groups: []
@@ -200,9 +199,9 @@ const StudentsList: React.FC<StudentsListProps> = ({students}) => {
                 onRowDoubleClick={(e) => editStudent(e.data)}>
                 <Column selectionMode="multiple" headerStyle={{ width: '3rem' }} exportable={false}></Column>
                 
-                <Column field="fullname" sortField="lastName" header="Name" body={nameBodyTemplate} sortable style={{ minWidth: '16rem' }}></Column>                
-                <Column field="dateOfBirth" header="Age" body={dateBodyTemplate} sortable style={{ minWidth: '10rem' }}></Column> 
-                <Column field="gender" header="Gender" body={genderBodyTemplate} sortable style={{ minWidth: '8rem' }}></Column>
+                <Column field="fullname" sortField="lastName" header="Name" body={nameBodyTemplate} sortable style={{ minWidth: '12rem' }}></Column>                
+                <Column field="dateOfBirth" header="Age" body={dateBodyTemplate} sortable style={{ minWidth: '4rem' }}></Column> 
+                <Column field="gender" header="Gender" body={genderBodyTemplate} sortable style={{ minWidth: '6rem' }}></Column>
                                 
                 <Column body={actionBodyTemplate} exportable={false} style={{ minWidth: '8rem', textAlign: 'right' }} bodyClassName='right_control'></Column>
             </DataTable>

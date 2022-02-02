@@ -115,13 +115,16 @@ const StudentDetails: React.FC<StudentDetailsProps> = props => {
     
     const getNumber = (str: string):number => {
         let num: number = 0
+        let res: number
         for (let i=0; i<str.length; i++) {
             if(!isNaN(Number(str[i]))) {
                num = i  
                break              
             }
         }
-        return parseInt( str.slice(num) )   
+        res = parseInt( str.slice(num) )
+        if (!isNaN(res)) return res
+        return 0   
     } 
     
     const onSchoolChange = (e: InputNumberChangeParams) => {
@@ -151,10 +154,10 @@ const StudentDetails: React.FC<StudentDetailsProps> = props => {
 
     const onInsuranceChange = (e: RadioButtonChangeParams) => {
         let _student = {...student};
-        _student['insurance'] = e.value;
+        let val = parseInt(e.value)
+        _student.insurance = !!val 
         setStudent(_student);
-    }    
-
+    } 
 
     const studentDialogFooter = (
         <React.Fragment>            
@@ -226,22 +229,22 @@ const StudentDetails: React.FC<StudentDetailsProps> = props => {
                     <div className="field col">
                         <label className="mb-3">Gender</label>
                         <div className="field-radiobutton col-4">
-                            <RadioButton disabled={props.noEditMode} inputId="gender1" name="gender" value="Female" onChange={onGenderSet} checked={student.gender === 'FEMALE'}  />
+                            <RadioButton disabled={props.noEditMode} inputId="gender1" name="gender" value="FEMALE" onChange={onGenderSet} checked={student.gender === 'FEMALE'}  />
                             <label htmlFor="gender1">Female</label>
                         </div>
                         <div className="field-radiobutton col-4">
-                            <RadioButton disabled={props.noEditMode} inputId="gender2" name="gender" value="Male" onChange={onGenderSet} checked={student.gender === 'MALE'} />
+                            <RadioButton disabled={props.noEditMode} inputId="gender2" name="gender" value="MALE" onChange={onGenderSet} checked={student.gender === 'MALE'} />
                             <label htmlFor="gender2">Male</label>
                         </div>                        
                     </div>
                     <div className="field col">
                     <label className="mb-3">Insurance</label>
                         <div className="field-radiobutton col-6">
-                            <RadioButton disabled={props.noEditMode} inputId="insurance1" name="insurance" onChange={onInsuranceChange} checked={student.insurance === true} />
+                            <RadioButton disabled={props.noEditMode} inputId="insurance1" name="insurance" value="1" onChange={onInsuranceChange} checked={student.insurance === true} />
                             <label htmlFor="insurance1">Yes</label>
                         </div>
                         <div className="field-radiobutton col-6">
-                            <RadioButton disabled={props.noEditMode} inputId="insurance2" name="insurance" onChange={onInsuranceChange} checked={student.insurance === false} />
+                            <RadioButton disabled={props.noEditMode} inputId="insurance2" name="insurance" value="0" onChange={onInsuranceChange} checked={student.insurance === false} />
                             <label htmlFor="insurance2">No</label>
                         </div>                        
                     </div>
