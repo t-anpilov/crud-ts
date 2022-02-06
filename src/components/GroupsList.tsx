@@ -14,8 +14,9 @@ import { RadioButtonChangeParams } from 'primereact/radiobutton';
 
 interface GroupsListProps {
     groups: Group [];
-    showMembersAtList: (e: DataTableSelectParams) => void
-    showAllMembersAtList: () => void
+    showMembersAtList: (e: DataTableSelectParams) => void;
+    showAllMembersAtList: () => void;
+    someGroupSelected: Boolean
 }
 
 const GroupsList: React.FC<GroupsListProps> = props => {
@@ -38,7 +39,6 @@ const GroupsList: React.FC<GroupsListProps> = props => {
         setSubmitted(false);
         setGroupDialog(true);
     } 
-
 
     const header = (
         <div className="flex flex-column md:flex-row md:align-items-center justify-content-between">
@@ -68,7 +68,7 @@ const GroupsList: React.FC<GroupsListProps> = props => {
 
             <div className="text-3xl text-800 font-bold mb-4">GROUPS</div>
             
-            <DataTable ref={dt} value={props.groups} selection={selectedGroup} onSelectionChange={(e) => setSelectedGroup(e.value)}
+            <DataTable ref={dt} value={props.groups} selection={props.someGroupSelected ? selectedGroup : null} onSelectionChange={(e) => setSelectedGroup(e.value)}
                 dataKey="id"
                 paginatorTemplate="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink CurrentPageReport RowsPerPageDropdown"
                 currentPageReportTemplate="Showing {first} to {last} of {totalRecords} groups"
@@ -83,7 +83,7 @@ const GroupsList: React.FC<GroupsListProps> = props => {
                                 
                 <Column body={actionBodyTemplate} exportable={false} style={{ minWidth: '8rem', textAlign: 'right' }} bodyClassName='right_control'></Column>
             </DataTable>
-
+            <Button label="All Students" className="p-button-secondary show_btn" onClick={props.showAllMembersAtList} />
             
         </div>
     )

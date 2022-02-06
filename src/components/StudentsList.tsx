@@ -14,7 +14,9 @@ import StudentDetails from './StudentDetails'
 import { getStudentDetails } from '../GetStudents'
 
 interface StudentsListProps {
-    students: Student []
+    students: Student [];
+    groupName?: string;
+    isGroupName: Boolean
 }
 
 export const emptyStudent: Student = {
@@ -31,7 +33,7 @@ export const emptyStudent: Student = {
 
 };
 
-const StudentsList: React.FC<StudentsListProps> = ({students}) => {
+const StudentsList: React.FC<StudentsListProps> = props => {
     
 
     const [studentsList, setStudentsList] = useState<Student[]>([]);
@@ -85,8 +87,8 @@ const StudentsList: React.FC<StudentsListProps> = ({students}) => {
   // q if we need
     const deleteStudent = () => {
         let _students : Student []
-        if (Array.isArray(students)) {
-            _students = students.filter((val: { id: string | number; }) => val.id !== student.id);
+        if (Array.isArray(props.students)) {
+            _students = props.students.filter((val: { id: string | number; }) => val.id !== student.id);
             setStudentsList(_students); 
         setDeleteStudentDialog(false);
         setStudent(emptyStudent);
@@ -100,8 +102,8 @@ const StudentsList: React.FC<StudentsListProps> = ({students}) => {
 
     const deleteSelectedStudents = () => {
         let _students : Student []
-        if (Array.isArray(students)) {
-            _students = students.filter((val: Student) => !selectedStudents.includes(val));
+        if (Array.isArray(props.students)) {
+            _students = props.students.filter((val: Student) => !selectedStudents.includes(val));
             setStudentsList(_students);
             setDeleteStudentsDialog(false);
             setSelectedStudents([]);
@@ -188,10 +190,12 @@ const StudentsList: React.FC<StudentsListProps> = ({students}) => {
         <div className="datatable-crud-demo surface-card p-4 border-round shadow-2">
             <Toast ref={toast} />
 
-            <div className="text-3xl text-800 font-bold mb-4">STUDENTS</div>
+            <div className="text-3xl text-800 font-bold mb-4">STUDENTS
+                {props.isGroupName &&  <span>{`  (${props.groupName})`}</span> }
+            </div>
 
             
-            <DataTable ref={dt} value={ students} selection={selectedStudents} onSelectionChange={(e) => setSelectedStudents(e.value)}
+            <DataTable ref={dt} value={ props.students} selection={selectedStudents} onSelectionChange={(e) => setSelectedStudents(e.value)}
                 dataKey="id" paginator rows={10} rowsPerPageOptions={[5, 10, 25]}
                 paginatorTemplate="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink CurrentPageReport RowsPerPageDropdown"
                 currentPageReportTemplate="Showing {first} to {last} of {totalRecords} students"

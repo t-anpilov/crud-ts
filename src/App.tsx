@@ -9,6 +9,7 @@ import 'primeflex/primeflex.css';
 import StudentsList from './components/StudentsList'
 import GroupsList from './components/GroupsList';
 import './app.css'
+
  
 export interface Student {
     id: string | number;
@@ -36,33 +37,54 @@ const App: React.FC = () => {
 
     const [studentsData, setStudentsData] = useState<Student[]>([]);
     const [groupsData, setGroupsData] = useState<Group[]>([]);
+    const [currentGroupName, setCurrentGroupName] = useState<string>();
+    const [isGroupSelected, setIsGroupSelected] = useState<Boolean>(false);
     
 
-    useEffect(() => {
+    /*useEffect(() => {
         getStudents().then(data => setStudentsData(data));
-    }, []);
+    }, []);*/
 
     useEffect(() => {
         getGroups().then(data => setGroupsData(data));
     }, []);
 
+    useEffect(() => {
+        getStudents().then(data => setStudentsData(data));
+    }, []);
+
     const studentsListHandler = (e: DataTableSelectParams) => {
-        getGroupsMembers(e.data.id).then(data => setStudentsData(data))
+        
+        getGroupsMembers(e.data.id)
+        .then(groupData => {
+            setStudentsData(groupData)          
+            
+        })
+        setIsGroupSelected(true)
+        setCurrentGroupName(e.data.groupDescription)
+        
     }
 
-    const studentsAllListHandler = () => {
-        
+    const studentsAllListHandler = () => {        
         getStudents().then(data => setStudentsData(data))
+        setIsGroupSelected(false)
+        setCurrentGroupName('')
     }
+
 
     return (
+                
         <div className="flex_container">
             <GroupsList 
                 groups={groupsData} 
                 showMembersAtList={studentsListHandler}
-                showAllMembersAtList={studentsAllListHandler}/>
-            <StudentsList students={studentsData} />
-        </div>  
+                showAllMembersAtList={studentsAllListHandler}
+                someGroupSelected = {isGroupSelected}/>
+            <StudentsList 
+                students={studentsData} 
+                groupName={currentGroupName} 
+                isGroupName = {isGroupSelected}/>
+        </div>
     );
 }
 

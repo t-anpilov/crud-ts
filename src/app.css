@@ -3,9 +3,35 @@
     justify-content: space-around;
 }
 .flex_container > div {
-    flex-basis: 40%;
+    flex-basis: 45%;
 }
 
 li {
     list-style-type: none;
+}
+
+.show_btn {
+    margin: 6px;
+    margin-top: 12px
+}
+
+.flex_box {
+    display: flex;
+    justify-content: space-between;
+}
+.nameInput {
+    flex-basis: 45%;
+}
+
+.titles {
+    font-weight: bold;
+}
+
+.p-button.p-button-icon-only.p-button-rounded { 
+    width: 2.0rem;   
+    height: 2.0rem;
+}
+
+.pi {
+    font-size: 0.8rem;
 }

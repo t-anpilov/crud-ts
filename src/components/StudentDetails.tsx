@@ -170,10 +170,12 @@ const StudentDetails: React.FC<StudentDetailsProps> = props => {
     const groupsList = (
         <React.Fragment>
             <div className='col'>
-                <div> List of groups: </div>
+                <label className='titles'> List of groups: </label>
                 <ul className='col-12'>
                     { student.groups && student.groups.map( group => {
-                        return  <li>{`${group.groupDescription}, ID:${group.id}`}</li>
+                        return  <li title = {`id:${group.id}, ${group.groupDescription}`}>
+                            {group.groupDescription}
+                        </li>
                     }) }    
                 </ul>
             </div>
@@ -199,25 +201,27 @@ const StudentDetails: React.FC<StudentDetailsProps> = props => {
                     alt='noPhoto'
                     className="block mt-0 mx-auto mb-5 w-12rem shadow-2" 
                 />}
-                <div className="field">
-                    <label htmlFor="firstName">First Name</label>
-                    <InputText id="firstName" disabled={props.noEditMode} value={student.firstName} onChange={(e) => onNameChange(e, 'firstName')} required className={classNames({ 'p-invalid': submitted && !student.firstName })} />
-                    {submitted && !student.firstName && <small className="p-error">Name is required.</small>}
+                <div className="field flex_box">
+                    <div className="nameInput">    
+                        <label htmlFor="firstName" className="titles">First Name</label>
+                        <InputText id="firstName" disabled={props.noEditMode} value={student.firstName} onChange={(e) => onNameChange(e, 'firstName')} required className={classNames({ 'p-invalid': submitted && !student.firstName })} />
+                        {submitted && !student.firstName && <small className="p-error">Name is required.</small>}
+                    </div>
+                    <div className="nameInput">
+                        <label htmlFor="middleName" className="titles">Middle Name</label>
+                        <InputText id="middleName" disabled={props.noEditMode} value={student.middleName} onChange={(e) => onNameChange(e, 'middleName')} required className={classNames({ 'p-invalid': submitted && !student.middleName })} />
+                        {submitted && !student.middleName && <small className="p-error">Name is required.</small>}
+                    </div>
                 </div>
                 <div className="field">
-                    <label htmlFor="middleName">Middle Name</label>
-                    <InputText id="middleName" disabled={props.noEditMode} value={student.middleName} onChange={(e) => onNameChange(e, 'middleName')} required className={classNames({ 'p-invalid': submitted && !student.middleName })} />
-                    {submitted && !student.middleName && <small className="p-error">Name is required.</small>}
-                </div>
-                <div className="field">
-                    <label htmlFor="lastName">Last Name</label>
+                    <label htmlFor="lastName" className="titles">Last Name</label>
                     <InputText id="lastName" disabled={props.noEditMode} value={student.lastName} onChange={(e) => onNameChange(e, 'lastName')} required className={classNames({ 'p-invalid': submitted && !student.lastName })} />
                     {submitted && !student.lastName && <small className="p-error">Name is required.</small>}
                 </div>
 
                 <div className="formgrid grid">
                     <div className="field col-6" >
-                        <label htmlFor="date">Date Of Birth</label>
+                        <label htmlFor="date" className="titles">Date Of Birth</label>
                         <Calendar 
                             id="date" 
                             disabled={props.noEditMode}
@@ -227,7 +231,7 @@ const StudentDetails: React.FC<StudentDetailsProps> = props => {
                             onChange={(e) => onDateChange(e)} />
                     </div> 
                     <div className="field col">
-                        <label className="mb-3">Gender</label>
+                        <label className="mb-3 titles">Gender</label>
                         <div className="field-radiobutton col-4">
                             <RadioButton disabled={props.noEditMode} inputId="gender1" name="gender" value="FEMALE" onChange={onGenderSet} checked={student.gender === 'FEMALE'}  />
                             <label htmlFor="gender1">Female</label>
@@ -238,7 +242,7 @@ const StudentDetails: React.FC<StudentDetailsProps> = props => {
                         </div>                        
                     </div>
                     <div className="field col">
-                    <label className="mb-3">Insurance</label>
+                    <label className="mb-3 titles">Insurance</label>
                         <div className="field-radiobutton col-6">
                             <RadioButton disabled={props.noEditMode} inputId="insurance1" name="insurance" value="1" onChange={onInsuranceChange} checked={student.insurance === true} />
                             <label htmlFor="insurance1">Yes</label>
@@ -253,13 +257,13 @@ const StudentDetails: React.FC<StudentDetailsProps> = props => {
                 
                 <div className="formgrid grid">  
                     <div className="field col">
-                        <label htmlFor="school">School</label>
+                        <label htmlFor="school" className="titles">School</label>
                         <InputNumber disabled={props.noEditMode} id="school" value={getNumber(student.school!)} onChange={(e) => onSchoolChange(e)} required className={classNames({ 'p-invalid': submitted && !student.school })} />
                         {submitted && !student.lastName && <small className="p-error">Number is required.</small>}
                     </div>                   
                     
                     <div className="field col">
-                        <label htmlFor="shift">Shift</label>
+                        <label htmlFor="shift" className="titles">Shift</label>
                         <Dropdown 
                             id="shift" 
                             disabled={props.noEditMode}
