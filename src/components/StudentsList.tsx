@@ -12,11 +12,21 @@ import 'primeflex/primeflex.css';
 import { Student } from '../App'  
 import StudentDetails from './StudentDetails'
 import { getStudentDetails } from '../GetStudents'
+import { addStudent } from '../addStudents'
 
 interface StudentsListProps {
     students: Student [];
     groupName?: string;
     isGroupName: Boolean
+}
+
+const createId = () => {
+    let id = '';
+    let chars = '0123456789'  // 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+    for (let i = 0; i < 2; i++) {
+        id += chars.charAt(Math.floor(Math.random() * chars.length));
+    }
+    return id;
 }
 
 export const emptyStudent: Student = {
@@ -62,7 +72,15 @@ const StudentsList: React.FC<StudentsListProps> = props => {
     const hideDialogHandler = () => {
         setStudentDialog(false)
         setSubmitted(false);                
-        setNoEdit(true)
+        setNoEdit(true);
+    } 
+
+    const hideAndSaveDialogHandler = (studentData: Student) => {
+        setStudentDialog(false)
+        setSubmitted(false);                
+        setNoEdit(true);
+        studentData.id = createId() //- temp solution       
+        addStudent(studentData)
     }    
 
     const hideDeleteStudentDialog = () => {
@@ -214,7 +232,8 @@ const StudentsList: React.FC<StudentsListProps> = props => {
                 isVisible={studentDialog}
                 studentDetailedData={currentStudent}
                 noEditMode={noEdit} 
-                hideDialog={hideDialogHandler} 
+                hideDialog={hideDialogHandler}
+                hideAndSaveDialog={hideAndSaveDialogHandler} 
                 allowEdit={allowEditHandler}/>
             }            
             

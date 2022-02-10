@@ -18,6 +18,7 @@ type StudentDetailsProps = {
     isVisible: boolean;
     noEditMode: boolean;
     hideDialog: () => void;
+    hideAndSaveDialog: (studentInfo: Student) => void;
     allowEdit: () => void;
     studentDetailedData: Student
  }
@@ -26,26 +27,16 @@ const StudentDetails: React.FC<StudentDetailsProps> = props => {
       
     
     const [student, setStudent] = useState<Student>(props.studentDetailedData || emptyStudent);    
-    const [submitted, setSubmitted] = useState(false); 
+    
     
     useEffect(() => {
        setStudent(props.studentDetailedData);
     }, [props.studentDetailedData])
-    
-        
-    /*const hideDialog = () => {        
-        setSubmitted(false);                
-        setNoEditMode(true)
-    }
 
-    const allowEdit = () => {
-        setNoEditMode(false)
-    }*/
     
 
-    /*const saveStudent = () => {
-        setSubmitted(true);
-        setEditMode(true);
+    const saveStudent = () => {
+        /*setSubmitted(true);
 
         if (student.firstName?.trim() &&student.lastName?.trim()) {
             let _students = [...students];
@@ -66,11 +57,11 @@ const StudentDetails: React.FC<StudentDetailsProps> = props => {
             setStudents(_students); // shouldn't work
             setStudentDialog(false);
             setStudent(emptyStudent);
-        }
+        }*/
     }
    
 
-    const findIndexById = (id: string | number) => {
+    /*const findIndexById = (id: string | number) => {
         let index = -1;
         for (let i = 0; i < students.length; i++) {
             if (students[i].id === id) {
@@ -80,19 +71,8 @@ const StudentDetails: React.FC<StudentDetailsProps> = props => {
         }
 
         return index;
-    }}*/
+    }*/  
 
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    const createId = () => {
-        let id = '';
-        let chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
-        for (let i = 0; i < 5; i++) {
-            id += chars.charAt(Math.floor(Math.random() * chars.length));
-        }
-        return id;
-    }
-
-    // need to change to save Element function onclick for 2nd buttom
 
     const onGenderSet = (e: RadioButtonChangeParams) => {
         let _student = {...student};
@@ -163,7 +143,7 @@ const StudentDetails: React.FC<StudentDetailsProps> = props => {
         <React.Fragment>            
             <Button label="Cancel" icon="pi pi-times" className="p-button-text" onClick={props.hideDialog} />
             {props.noEditMode && <Button label="Edit" icon="pi pi-check" onClick={props.allowEdit} />}
-            {!props.noEditMode && <Button label="Save" icon="pi pi-check" onClick={props.hideDialog} />} 
+            {!props.noEditMode && <Button label="Save" icon="pi pi-check" onClick={() => props.hideAndSaveDialog(student)} />} 
         </React.Fragment>
     );
 
@@ -204,19 +184,19 @@ const StudentDetails: React.FC<StudentDetailsProps> = props => {
                 <div className="field flex_box">
                     <div className="nameInput">    
                         <label htmlFor="firstName" className="titles">First Name</label>
-                        <InputText id="firstName" disabled={props.noEditMode} value={student.firstName} onChange={(e) => onNameChange(e, 'firstName')} required className={classNames({ 'p-invalid': submitted && !student.firstName })} />
-                        {submitted && !student.firstName && <small className="p-error">Name is required.</small>}
+                        <InputText id="firstName" disabled={props.noEditMode} value={student.firstName} onChange={(e) => onNameChange(e, 'firstName')} required className={classNames({ 'p-invalid': !props.noEditMode && !student.firstName })} />
+                        {!props.noEditMode && !student.firstName && <small className="p-error">Name is required.</small>}
                     </div>
                     <div className="nameInput">
                         <label htmlFor="middleName" className="titles">Middle Name</label>
-                        <InputText id="middleName" disabled={props.noEditMode} value={student.middleName} onChange={(e) => onNameChange(e, 'middleName')} required className={classNames({ 'p-invalid': submitted && !student.middleName })} />
-                        {submitted && !student.middleName && <small className="p-error">Name is required.</small>}
+                        <InputText id="middleName" disabled={props.noEditMode} value={student.middleName} onChange={(e) => onNameChange(e, 'middleName')} required className={classNames({ 'p-invalid': !props.noEditMode && !student.middleName })} />
+                        {!props.noEditMode && !student.middleName && <small className="p-error">Name is required.</small>}
                     </div>
                 </div>
                 <div className="field">
                     <label htmlFor="lastName" className="titles">Last Name</label>
-                    <InputText id="lastName" disabled={props.noEditMode} value={student.lastName} onChange={(e) => onNameChange(e, 'lastName')} required className={classNames({ 'p-invalid': submitted && !student.lastName })} />
-                    {submitted && !student.lastName && <small className="p-error">Name is required.</small>}
+                    <InputText id="lastName" disabled={props.noEditMode} value={student.lastName} onChange={(e) => onNameChange(e, 'lastName')} required className={classNames({ 'p-invalid': !props.noEditMode && !student.lastName })} />
+                    {!props.noEditMode && !student.lastName && <small className="p-error">Name is required.</small>}
                 </div>
 
                 <div className="formgrid grid">
@@ -258,8 +238,8 @@ const StudentDetails: React.FC<StudentDetailsProps> = props => {
                 <div className="formgrid grid">  
                     <div className="field col">
                         <label htmlFor="school" className="titles">School</label>
-                        <InputNumber disabled={props.noEditMode} id="school" value={getNumber(student.school!)} onChange={(e) => onSchoolChange(e)} required className={classNames({ 'p-invalid': submitted && !student.school })} />
-                        {submitted && !student.lastName && <small className="p-error">Number is required.</small>}
+                        <InputNumber disabled={props.noEditMode} id="school" value={getNumber(student.school!)} onChange={(e) => onSchoolChange(e)} required className={classNames({ 'p-invalid': !props.noEditMode && !student.school })} />
+                        {!props.noEditMode && !student.lastName && <small className="p-error">Number is required.</small>}
                     </div>                   
                     
                     <div className="field col">
