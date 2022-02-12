@@ -11,22 +11,27 @@ import 'primeicons/primeicons.css';
 import 'primeflex/primeflex.css';
 import { Student } from '../App'  
 import StudentDetails from './StudentDetails'
-import { getStudentDetails } from '../GetStudents'
+import { getStudents, getStudentDetails } from '../GetStudents'
 import { addStudent } from '../addStudents'
 
 interface StudentsListProps {
     students: Student [];
     groupName?: string;
-    isGroupName: Boolean
+    isGroupName: Boolean;
+    refreshAll: () => void
 }
 
-const createId = () => {
-    let id = '';
-    let chars = '0123456789'  // 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+const createId = async () => {
+    let id:string | number = '';
+    /*let chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
     for (let i = 0; i < 2; i++) {
         id += chars.charAt(Math.floor(Math.random() * chars.length));
-    }
-    return id;
+    }*/    
+    let idArray: Array<string | number> = []
+    const array: Student [] = await getStudents()
+    array.map((item:Student) => idArray.push(item.id));
+    id = +idArray[idArray.length-1] + 1;        
+    return id    
 }
 
 export const emptyStudent: Student = {
@@ -51,17 +56,18 @@ const StudentsList: React.FC<StudentsListProps> = props => {
     const [deleteStudentDialog, setDeleteStudentDialog] = useState(false);
     const [deleteStudentsDialog, setDeleteStudentsDialog] = useState(false);  
     const [student, setStudent] = useState<Student>(emptyStudent);
-    const [currentStudent, setCurrentStudent] = useState<Student>()
+    const [currentStudent, setCurrentStudent] = useState<Student>(emptyStudent)
     const [selectedStudents, setSelectedStudents] = useState<Student[]>([]);
     const [noEdit, setNoEdit] = useState(true);
-    const [submitted, setSubmitted] = useState(false);
+    const [submitted, setSubmitted] = useState(false); // not sure if I'll use it
     const [globalFilter, setGlobalFilter] = useState<string>();
     const toast = useRef<Toast>(null);
     const dt = useRef<DataTable>(null);
     
     
     const openNew = () => {
-        setCurrentStudent(emptyStudent);
+        let _currentStudent = {...emptyStudent}
+        setCurrentStudent({..._currentStudent}); 
         setSubmitted(false);
         setStudentDialog(true);
     } 
@@ -75,12 +81,15 @@ const StudentsList: React.FC<StudentsListProps> = props => {
         setNoEdit(true);
     } 
 
-    const hideAndSaveDialogHandler = (studentData: Student) => {
+    const hideAndSaveDialogHandler = async (studentData: Student) => {
         setStudentDialog(false)
         setSubmitted(false);                
         setNoEdit(true);
-        studentData.id = createId() //- temp solution       
-        addStudent(studentData)
+        studentData.id = await createId();            
+        addStudent(studentData);
+        props.refreshAll();
+        toast.current?.show({ severity: 'success', summary: 'Successful', detail: `Student ${studentData.firstName} added`, life: 3000 });
+        
     }    
 
     const hideDeleteStudentDialog = () => {
@@ -127,7 +136,7 @@ const StudentsList: React.FC<StudentsListProps> = props => {
             setSelectedStudents([]);
             toast.current?.show({ severity: 'success', summary: 'Successful', detail: 'Students Deleted', life: 3000 });
         }
-        console.log (studentsList) // checking rempve function
+        console.log (studentsList) // checking remove function
     }    
 
     const nameBodyTemplate = (rowData: Student) => {
@@ -235,6 +244,7 @@ const StudentsList: React.FC<StudentsListProps> = props => {
                 hideDialog={hideDialogHandler}
                 hideAndSaveDialog={hideAndSaveDialogHandler} 
                 allowEdit={allowEditHandler}/>
+                
             }            
             
             <Dialog visible={deleteStudentDialog} style={{ width: '450px' }} header="Confirm" modal footer={deleteStudentDialogFooter} onHide={hideDeleteStudentDialog}>

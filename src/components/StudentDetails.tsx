@@ -11,8 +11,7 @@ import 'primereact/resources/themes/saga-blue/theme.css';
 import 'primereact/resources/primereact.min.css';
 import 'primeicons/primeicons.css';
 import 'primeflex/primeflex.css';
-import { Student, Shifts } from '../App'  
-import { emptyStudent } from './StudentsList'
+import { Student, Shifts } from '../App' 
 
 type StudentDetailsProps = { 
     isVisible: boolean;
@@ -25,15 +24,13 @@ type StudentDetailsProps = {
 
 const StudentDetails: React.FC<StudentDetailsProps> = props => {
       
-    
-    const [student, setStudent] = useState<Student>(props.studentDetailedData || emptyStudent);    
+    const [student, setStudent] = useState<Student>(props.studentDetailedData);    
     
     
     useEffect(() => {
        setStudent(props.studentDetailedData);
     }, [props.studentDetailedData])
 
-    
 
     const saveStudent = () => {
         /*setSubmitted(true);
@@ -149,16 +146,16 @@ const StudentDetails: React.FC<StudentDetailsProps> = props => {
 
     const groupsList = (
         <React.Fragment>
-            <div className='col'>
+            {student.groups && student.groups.length>0 && <div className='col'>
                 <label className='titles'> List of groups: </label>
                 <ul className='col-12'>
                     { student.groups && student.groups.map( group => {
-                        return  <li title = {`id:${group.id}, ${group.groupDescription}`}>
+                        return  <li title = {`id:${group.id}, ${group.groupDescription}`} key={group.id}>
                             {group.groupDescription}
                         </li>
                     }) }    
                 </ul>
-            </div>
+            </div>}
         </React.Fragment>
     );
 

@@ -69,6 +69,7 @@ const App: React.FC = () => {
         getStudents().then(data => setStudentsData(data))
         setIsGroupSelected(false)
         setCurrentGroupName('')
+        console.log('refresh')
     }
 
 
@@ -83,7 +84,8 @@ const App: React.FC = () => {
             <StudentsList 
                 students={studentsData} 
                 groupName={currentGroupName} 
-                isGroupName = {isGroupSelected}/>
+                isGroupName = {isGroupSelected}
+                refreshAll= {studentsAllListHandler}/>
         </div>
     );
 }
