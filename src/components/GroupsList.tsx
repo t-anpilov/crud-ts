@@ -3,14 +3,14 @@ import { DataTable, DataTableSelectParams } from 'primereact/datatable';
 import { Column } from 'primereact/column';
 import { Toast } from 'primereact/toast';
 import { Button } from 'primereact/button';
-import { Dialog } from 'primereact/dialog';
 import { InputText } from 'primereact/inputtext';
 import 'primereact/resources/themes/saga-blue/theme.css';
 import 'primereact/resources/primereact.min.css';
 import 'primeicons/primeicons.css';
 import 'primeflex/primeflex.css';
 import { Group } from '../App'
-import { RadioButtonChangeParams } from 'primereact/radiobutton';
+import GroupDetails from './GroupDetails'
+import { getGroupsMembers } from '../getGroups'
 
 interface GroupsListProps {
     groups: Group [];
@@ -28,17 +28,61 @@ const GroupsList: React.FC<GroupsListProps> = props => {
     const [globalFilter, setGlobalFilter] = useState<string>();
     const [selectedGroup, setSelectedGroup] = useState<Group>(emptyGroup);
     const [deleteGroupDialog, setDeleteGroupDialog] = useState(false);
-    
+    const [noEdit, setNoEdit] = useState(true);
     const [currentGroup, setCurrentGroup] = useState<Group>(); 
     const [submitted, setSubmitted] = useState(false);
+    const [studentsNumber, setStudentsNumber] = useState<number>(0) 
     const toast = useRef<Toast>(null);
     const dt = useRef<DataTable>(null);
     
     const createGroup = () => {
-        setCurrentGroup(emptyGroup);
+        let _currentGroup = {...emptyGroup}
+        setCurrentGroup({..._currentGroup}); 
         setSubmitted(false);
         setGroupDialog(true);
     } 
+
+    const allowEditHandler = () => {        
+        setNoEdit(false)
+    }
+
+    const hideDialogHandler = () => {
+        setGroupDialog(false)
+        setSubmitted(false);                
+        setNoEdit(true);
+    } 
+
+    const checkOfGroup = (unchecked: Group) => {
+        if (
+            unchecked.id &&
+            unchecked.groupDescription.trim()            
+        ) return true
+        else return false
+    }
+
+    const hideAndSaveDialogHandler = async (groupData: Group) => {
+        if (checkOfGroup(groupData)) {
+            setGroupDialog(false)
+        setSubmitted(false);                
+        setNoEdit(true);
+        //groupData.id = await createId();            
+        //addGroup(groupData);
+        //props.refreshAll();
+        toast.current?.show({ severity: 'success', summary: 'Successful', detail: `Group ${groupData.groupDescription} added`, life: 3000 });
+        } else {
+            toast.current?.show({ severity: 'warn', summary: 'Warning', detail: 'Please fill all required fields', life: 3000 });
+        }
+        
+    } 
+    const editGroup = async (group: Group) => {  
+        const _currentGroup = {...group};
+        setCurrentGroup(_currentGroup); 
+        const listOfStudents = await getGroupsMembers(group.id);
+        console.log(listOfStudents);
+        setStudentsNumber(listOfStudents.length);
+        setGroupDialog(true);
+    }
+
 
     const header = (
         <div className="flex flex-column md:flex-row md:align-items-center justify-content-between">
@@ -56,7 +100,7 @@ const GroupsList: React.FC<GroupsListProps> = props => {
     const actionBodyTemplate = (rowData: Group) => {
         return (
             <React.Fragment>
-                <Button icon="pi pi-pencil" className="p-button-rounded p-button-success mr-2" onClick={() => console.log(rowData)} />
+                <Button icon="pi pi-pencil" className="p-button-rounded p-button-success mr-2" onClick={() => editGroup(rowData)} />
                 <Button icon="pi pi-trash" className="p-button-rounded p-button-danger" onClick={() => alert(`delete ${rowData}?`)} />
             </React.Fragment>
         );
@@ -84,6 +128,17 @@ const GroupsList: React.FC<GroupsListProps> = props => {
                 <Column body={actionBodyTemplate} exportable={false} style={{ minWidth: '8rem', textAlign: 'right' }} bodyClassName='right_control'></Column>
             </DataTable>
             <Button label="All Students" className="p-button-secondary show_btn" onClick={props.showAllMembersAtList} />
+
+            {currentGroup && <GroupDetails 
+                isVisible={groupDialog}
+                groupDetailedData={currentGroup}
+                noEditMode={noEdit} 
+                hideDialog={hideDialogHandler}
+                hideAndSaveDialog={hideAndSaveDialogHandler} 
+                allowEdit={allowEditHandler}
+                numberOfMembers={studentsNumber}/>
+                
+            }
             
         </div>
     )

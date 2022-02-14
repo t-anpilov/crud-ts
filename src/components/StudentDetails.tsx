@@ -20,7 +20,7 @@ type StudentDetailsProps = {
     hideAndSaveDialog: (studentInfo: Student) => void;
     allowEdit: () => void;
     studentDetailedData: Student
- }
+}
 
 const StudentDetails: React.FC<StudentDetailsProps> = props => {
       

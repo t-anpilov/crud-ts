@@ -81,14 +81,31 @@ const StudentsList: React.FC<StudentsListProps> = props => {
         setNoEdit(true);
     } 
 
+    const checkOf = (unchecked: Student) => {
+        if (
+            unchecked.firstName.trim() &&
+            unchecked.lastName.trim() &&
+            unchecked.middleName.trim() &&
+            unchecked.school && unchecked.school.trim() &&
+            unchecked.dateOfBirth &&
+            unchecked.shift &&
+            unchecked.gender
+        ) return true
+        else return false
+    }
+
     const hideAndSaveDialogHandler = async (studentData: Student) => {
-        setStudentDialog(false)
+        if (checkOf(studentData)) {
+            setStudentDialog(false)
         setSubmitted(false);                
         setNoEdit(true);
         studentData.id = await createId();            
         addStudent(studentData);
         props.refreshAll();
         toast.current?.show({ severity: 'success', summary: 'Successful', detail: `Student ${studentData.firstName} added`, life: 3000 });
+        } else {
+            toast.current?.show({ severity: 'warn', summary: 'Warning', detail: 'Please fill all required fields', life: 3000 });
+        }
         
     }    
 
