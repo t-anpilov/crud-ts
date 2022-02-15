@@ -28,6 +28,14 @@ const GroupDetails: React.FC<GroupDetailsProps> = props => {
        setGroup(props.groupDetailedData);
     }, [props.groupDetailedData]);
 
+    const onGroupNameChange = (e: ChangeEvent<HTMLInputElement>) => {
+        const val = (e.target && e.target.value) || '';
+        let _group: Group = {...group};
+        
+            _group.groupDescription = val;
+            
+        setGroup(_group);
+    } 
 
     const groupDialogFooter = (
         <React.Fragment>            
@@ -49,7 +57,7 @@ const GroupDetails: React.FC<GroupDetailsProps> = props => {
                 <div className="field flex_box">
                     <div className="nameInput">    
                         <label htmlFor="firstName" className="titles">Group Name</label>
-                        <InputText id="firstName" disabled={props.noEditMode} value={group.groupDescription} onChange={(e) => console.log(e, 'event')} required className={classNames({ 'p-invalid': !props.noEditMode && !group.groupDescription })} />
+                        <InputText id="firstName" disabled={props.noEditMode} value={group.groupDescription} onChange={(e) => onGroupNameChange(e)} required className={classNames({ 'p-invalid': !props.noEditMode && !group.groupDescription })} />
                         {!props.noEditMode && !group.groupDescription && <small className="p-error">Name is required.</small>}
                     </div>
                     <div>

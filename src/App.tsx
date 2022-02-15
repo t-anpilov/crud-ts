@@ -47,7 +47,7 @@ const App: React.FC = () => {
 
     useEffect(() => {
         getGroups().then(data => setGroupsData(data));
-    }, []);
+    }, [groupsData]);
 
     useEffect(() => {
         getStudents().then(data => setStudentsData(data));
@@ -58,7 +58,7 @@ const App: React.FC = () => {
         getGroupsMembers(e.data.id)
         .then(groupData => {
             setStudentsData(groupData)          
-            
+            console.log(groupData)    
         })
         setIsGroupSelected(true)
         setCurrentGroupName(e.data.groupDescription)
@@ -72,6 +72,13 @@ const App: React.FC = () => {
         console.log('refresh')
     }
 
+    const groupsListRefreshHandler = () => {        
+        getGroups().then(data => setGroupsData(data))
+        setIsGroupSelected(false)
+        console.log('refresh')
+    }
+
+
 
     return (
                 
@@ -80,6 +87,7 @@ const App: React.FC = () => {
                 groups={groupsData} 
                 showMembersAtList={studentsListHandler}
                 showAllMembersAtList={studentsAllListHandler}
+                groupsListRefresh={groupsListRefreshHandler}
                 someGroupSelected = {isGroupSelected}/>
             <StudentsList 
                 students={studentsData} 

@@ -10,13 +10,24 @@ import 'primeicons/primeicons.css';
 import 'primeflex/primeflex.css';
 import { Group } from '../App'
 import GroupDetails from './GroupDetails'
-import { getGroupsMembers } from '../getGroups'
+import { getGroups, getGroupsMembers } from '../getGroups'
+import { addGroup } from '../addGroup'
 
 interface GroupsListProps {
     groups: Group [];
     showMembersAtList: (e: DataTableSelectParams) => void;
     showAllMembersAtList: () => void;
+    groupsListRefresh: () => void;
     someGroupSelected: Boolean
+}
+
+const createId = async () => {
+    let id:string | number = '';      
+    let idArray: Array<string | number> = []
+    const array: Group [] = await getGroups()
+    array.map((item:Group) => idArray.push(item.id));
+    id = +idArray[idArray.length-1] + 1;        
+    return id    
 }
 
 const GroupsList: React.FC<GroupsListProps> = props => {
@@ -54,7 +65,6 @@ const GroupsList: React.FC<GroupsListProps> = props => {
 
     const checkOfGroup = (unchecked: Group) => {
         if (
-            unchecked.id &&
             unchecked.groupDescription.trim()            
         ) return true
         else return false
@@ -65,9 +75,9 @@ const GroupsList: React.FC<GroupsListProps> = props => {
             setGroupDialog(false)
         setSubmitted(false);                
         setNoEdit(true);
-        //groupData.id = await createId();            
-        //addGroup(groupData);
-        //props.refreshAll();
+        groupData.id = await createId();            
+        addGroup(groupData);
+        props.groupsListRefresh();
         toast.current?.show({ severity: 'success', summary: 'Successful', detail: `Group ${groupData.groupDescription} added`, life: 3000 });
         } else {
             toast.current?.show({ severity: 'warn', summary: 'Warning', detail: 'Please fill all required fields', life: 3000 });
