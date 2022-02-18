@@ -30,32 +30,6 @@ const StudentDetails: React.FC<StudentDetailsProps> = props => {
     useEffect(() => {
        setStudent(props.studentDetailedData);
     }, [props.studentDetailedData])
-
-
-    const saveStudent = () => {
-        /*setSubmitted(true);
-
-        if (student.firstName?.trim() &&student.lastName?.trim()) {
-            let _students = [...students];
-            let _student = {...student};
-            if (student.id) {
-                const index = findIndexById(student.id);
-
-                _students[index] = _student;
-                toast.current?.show({ severity: 'success', summary: 'Successful', detail: 'Student\'s Data Updated', life: 3000 });
-            }
-            else {
-                _student.id = createId();
-                _student.photoId = 'avatar2.png';
-                _students.push(_student);
-                toast.current?.show({ severity: 'success', summary: 'Successful', detail: 'Student\'s Profile Updated', life: 3000 });
-            }
-
-            setStudents(_students); // shouldn't work
-            setStudentDialog(false);
-            setStudent(emptyStudent);
-        }*/
-    }
    
 
     /*const findIndexById = (id: string | number) => {

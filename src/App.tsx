@@ -57,8 +57,7 @@ const App: React.FC = () => {
         
         getGroupsMembers(e.data.id)
         .then(groupData => {
-            setStudentsData(groupData)          
-            console.log(groupData)    
+            setStudentsData(groupData) 
         })
         setIsGroupSelected(true)
         setCurrentGroupName(e.data.groupDescription)
@@ -69,16 +68,15 @@ const App: React.FC = () => {
         getStudents().then(data => setStudentsData(data))
         setIsGroupSelected(false)
         setCurrentGroupName('')
-        console.log('refresh')
     }
 
-    const groupsListRefreshHandler = () => {        
-        getGroups().then(data => setGroupsData(data))
+    //does not work (need to use hook)
+    const studentsListRefresh = () => {        
+        getStudents().then(data => setStudentsData(data))
         setIsGroupSelected(false)
+        setCurrentGroupName('')
         console.log('refresh')
     }
-
-
 
     return (
                 
@@ -87,13 +85,12 @@ const App: React.FC = () => {
                 groups={groupsData} 
                 showMembersAtList={studentsListHandler}
                 showAllMembersAtList={studentsAllListHandler}
-                groupsListRefresh={groupsListRefreshHandler}
                 someGroupSelected = {isGroupSelected}/>
             <StudentsList 
                 students={studentsData} 
                 groupName={currentGroupName} 
                 isGroupName = {isGroupSelected}
-                refreshAll= {studentsAllListHandler}/>
+                refreshAll= {studentsListRefresh}/>
         </div>
     );
 }
