@@ -70,25 +70,23 @@ const GroupsList: React.FC<GroupsListProps> = props => {
     }
 
     const hideAndSaveDialogHandler = async (groupData: Group) => {
-        
-        if (checkOfGroup(groupData) && !groupData.id) {
-            setGroupDialog(false)
-            setSubmitted(false);                
-            setNoEdit(true);
-            groupData.id = await createId();            
-            addGroup(groupData);
-            toast.current?.show({ severity: 'success', summary: 'Successful', detail: `Group ${groupData.groupDescription} added`, life: 3000 });
-        } else if (checkOfGroup(groupData) && groupData.id) {
-            setGroupDialog(false)
-            setSubmitted(false);                
-            setNoEdit(true);
-            addGroup(groupData);
-            toast.current?.show({ severity: 'success', summary: 'Successful', detail: `Group ${groupData.groupDescription} updated`, life: 3000 })
+        if (!checkOfGroup(groupData)) {
+            toast.current?.show({ severity: 'warn', summary: 'Warning', detail: 'Please fill all required fields', life: 3000 }); 
         } else {
-            toast.current?.show({ severity: 'warn', summary: 'Warning', detail: 'Please fill all required fields', life: 3000 });
-        }        
+            setGroupDialog(false)
+            setSubmitted(false);                
+            setNoEdit(true);
+            if (!groupData.id) {
+                groupData.id = await createId();            
+                addGroup(groupData);
+                toast.current?.show({ severity: 'success', summary: 'Successful', detail: `Group ${groupData.groupDescription} added`, life: 3000 });
+            } else {
+                addGroup(groupData);
+                toast.current?.show({ severity: 'success', summary: 'Successful', detail: `Group ${groupData.groupDescription} updated`, life: 3000 })  
+            }
+        }       
     } 
-    
+
     const editGroup = async (group: Group) => {  
         const _currentGroup = {...group};
         setCurrentGroup(_currentGroup); 

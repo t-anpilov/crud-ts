@@ -95,25 +95,22 @@ const StudentsList: React.FC<StudentsListProps> = props => {
     }
 
     const hideAndSaveDialogHandler = async (studentData: Student) => {
-        if (checkOf(studentData) && !studentData.id) {
+        if (!checkOf(studentData)) {
+            toast.current?.show({ severity: 'warn', summary: 'Warning', detail: 'Please fill all required fields', life: 3000 });
+        } else {
             setStudentDialog(false)
             setSubmitted(false);                
             setNoEdit(true);
-            studentData.id = await createId();            
-            addStudent(studentData);
+            if (!studentData.id) {
+                studentData.id = await createId();            
+                addStudent(studentData);                
+                toast.current?.show({ severity: 'success', summary: 'Successful', detail: `Student ${studentData.firstName} added`, life: 3000 }); 
+            } else {
+                addStudent(studentData);                
+                toast.current?.show({ severity: 'success', summary: 'Successful', detail: `Student ${studentData.firstName} updated`, life: 3000 });
+            }
             props.refreshAll();
-            toast.current?.show({ severity: 'success', summary: 'Successful', detail: `Student ${studentData.firstName} added`, life: 3000 });
-        } else if (checkOf(studentData) && studentData.id) {
-            setStudentDialog(false)
-            setSubmitted(false);                
-            setNoEdit(true);            
-            addStudent(studentData);
-            props.refreshAll();
-            toast.current?.show({ severity: 'success', summary: 'Successful', detail: `Student ${studentData.firstName} updated`, life: 3000 });
-        } else {
-            toast.current?.show({ severity: 'warn', summary: 'Warning', detail: 'Please fill all required fields', life: 3000 });
         }
-        
     }    
 
     const hideDeleteStudentDialog = () => {
