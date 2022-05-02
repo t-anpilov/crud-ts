@@ -39,15 +39,11 @@ const App: React.FC = () => {
     const [groupsData, setGroupsData] = useState<Group[]>([]);
     const [currentGroupName, setCurrentGroupName] = useState<string>();
     const [isGroupSelected, setIsGroupSelected] = useState<Boolean>(false);
+    const [updateList, setUpdateList] = useState<Boolean>(false);
     
-
-    /*useEffect(() => {
-        getStudents().then(data => setStudentsData(data));
-    }, []);*/
-
     useEffect(() => {
         getGroups().then(data => setGroupsData(data));
-    }, [groupsData]);
+    }, [updateList])
 
     useEffect(() => {
         getStudents().then(data => setStudentsData(data));
@@ -70,12 +66,15 @@ const App: React.FC = () => {
         setCurrentGroupName('')
     }
 
-    //does not work (need to use hook)
-    const studentsListRefresh = () => {        
-        getStudents().then(data => setStudentsData(data))
-        setIsGroupSelected(false)
-        setCurrentGroupName('')
-        console.log('refresh')
+    //const currentPage = window.location
+
+    
+
+    const refreshAllHandler = () => {        
+        //currentPage.reload()
+        console.log('start ' + updateList)
+        setUpdateList(!updateList)
+        console.log('finish ' + updateList)
     }
 
     return (
@@ -85,12 +84,14 @@ const App: React.FC = () => {
                 groups={groupsData} 
                 showMembersAtList={studentsListHandler}
                 showAllMembersAtList={studentsAllListHandler}
-                someGroupSelected = {isGroupSelected}/>
+                someGroupSelected = {isGroupSelected}
+                refreshAll = {refreshAllHandler}/>
             <StudentsList 
                 students={studentsData} 
                 groupName={currentGroupName} 
                 isGroupName = {isGroupSelected}
-                refreshAll= {studentsListRefresh}/>
+                refreshAll = {studentsAllListHandler}/>
+            
         </div>
     );
 }

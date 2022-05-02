@@ -13,11 +13,12 @@ import { Student } from '../App'
 import StudentDetails from './StudentDetails'
 import { getStudents, getStudentDetails } from '../GetStudents'
 import { addStudent } from '../addStudents'
+import { removeStudent } from '../removeStudent'
 
 interface StudentsListProps {
     students: Student [];
     groupName?: string;
-    isGroupName: Boolean;
+    isGroupName: Boolean;    
     refreshAll: () => void
 }
 
@@ -59,7 +60,6 @@ const StudentsList: React.FC<StudentsListProps> = props => {
     const [currentStudent, setCurrentStudent] = useState<Student>(emptyStudent)
     const [selectedStudents, setSelectedStudents] = useState<Student[]>([]);
     const [noEdit, setNoEdit] = useState(true);
-    const [submitted, setSubmitted] = useState(false); // not sure if I'll use it
     const [globalFilter, setGlobalFilter] = useState<string>();
     const toast = useRef<Toast>(null);
     const dt = useRef<DataTable>(null);
@@ -68,16 +68,15 @@ const StudentsList: React.FC<StudentsListProps> = props => {
     const openNew = () => {
         let _currentStudent = {...emptyStudent}
         setCurrentStudent({..._currentStudent}); 
-        setSubmitted(false);
         setStudentDialog(true);
+        setNoEdit(false);
     } 
     const allowEditHandler = () => {        
         setNoEdit(false)
     }
 
     const hideDialogHandler = () => {
-        setStudentDialog(false)
-        setSubmitted(false);                
+        setStudentDialog(false);            
         setNoEdit(true);
     } 
 
@@ -98,18 +97,17 @@ const StudentsList: React.FC<StudentsListProps> = props => {
         if (!checkOf(studentData)) {
             toast.current?.show({ severity: 'warn', summary: 'Warning', detail: 'Please fill all required fields', life: 3000 });
         } else {
-            setStudentDialog(false)
-            setSubmitted(false);                
+            setStudentDialog(false);           
             setNoEdit(true);
             if (!studentData.id) {
                 studentData.id = await createId();            
                 addStudent(studentData);                
-                toast.current?.show({ severity: 'success', summary: 'Successful', detail: `Student ${studentData.firstName} added`, life: 3000 }); 
+                toast.current?.show({ severity: 'success', summary: 'Successful', detail: `Student ${studentData.firstName} id: ${studentData.id} added`, life: 3000 }); 
             } else {
                 addStudent(studentData);                
                 toast.current?.show({ severity: 'success', summary: 'Successful', detail: `Student ${studentData.firstName} updated`, life: 3000 });
             }
-            props.refreshAll();
+            props.refreshAll()
         }
     }    
 
@@ -127,12 +125,11 @@ const StudentsList: React.FC<StudentsListProps> = props => {
         setStudentDialog(true);
     }
     
-
     const confirmDeleteStudent = (student: Student) => {
-        setStudent(student);
+        removeStudent(student.id)
         setDeleteStudentDialog(true);
     }
-  // q if we need
+  
     const deleteStudent = () => {
         let _students : Student []
         if (Array.isArray(props.students)) {

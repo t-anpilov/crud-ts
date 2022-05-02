@@ -17,7 +17,8 @@ interface GroupsListProps {
     groups: Group [];
     showMembersAtList: (e: DataTableSelectParams) => void;
     showAllMembersAtList: () => void;
-    someGroupSelected: Boolean
+    someGroupSelected: Boolean;    
+    refreshAll: () => void
 }
 
 const createId = async () => {
@@ -40,16 +41,15 @@ const GroupsList: React.FC<GroupsListProps> = props => {
     const [deleteGroupDialog, setDeleteGroupDialog] = useState(false);
     const [noEdit, setNoEdit] = useState(true);
     const [currentGroup, setCurrentGroup] = useState<Group>(); 
-    const [submitted, setSubmitted] = useState(false);
     const [studentsNumber, setStudentsNumber] = useState<number>(0) 
     const toast = useRef<Toast>(null);
     const dt = useRef<DataTable>(null);
     
     const createGroup = () => {
-        let _currentGroup = {...emptyGroup}
-        setCurrentGroup({..._currentGroup}); 
-        setSubmitted(false);
+        let _currentGroup = {...emptyGroup};
+        setCurrentGroup({..._currentGroup});         
         setGroupDialog(true);
+        setNoEdit(false);
     } 
 
     const allowEditHandler = () => {        
@@ -57,8 +57,7 @@ const GroupsList: React.FC<GroupsListProps> = props => {
     }
 
     const hideDialogHandler = () => {
-        setGroupDialog(false)
-        setSubmitted(false);                
+        setGroupDialog(false)              
         setNoEdit(true);
     } 
 
@@ -73,8 +72,7 @@ const GroupsList: React.FC<GroupsListProps> = props => {
         if (!checkOfGroup(groupData)) {
             toast.current?.show({ severity: 'warn', summary: 'Warning', detail: 'Please fill all required fields', life: 3000 }); 
         } else {
-            setGroupDialog(false)
-            setSubmitted(false);                
+            setGroupDialog(false);             
             setNoEdit(true);
             if (!groupData.id) {
                 groupData.id = await createId();            
@@ -84,6 +82,7 @@ const GroupsList: React.FC<GroupsListProps> = props => {
                 addGroup(groupData);
                 toast.current?.show({ severity: 'success', summary: 'Successful', detail: `Group ${groupData.groupDescription} updated`, life: 3000 })  
             }
+            props.refreshAll()
         }       
     } 
 

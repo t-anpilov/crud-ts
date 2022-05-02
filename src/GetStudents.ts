@@ -3,7 +3,7 @@ function getStudents() {
         method: 'GET',
         mode: 'cors'})    
     .then(res => res.json())
-    .then(d =>   d.content)
+    .then(d => d.content)
 }
 
 function getStudentDetails (id: string | number) { 
