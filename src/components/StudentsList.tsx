@@ -11,7 +11,7 @@ import 'primeicons/primeicons.css';
 import 'primeflex/primeflex.css';
 import { Student } from '../App'  
 import StudentDetails from './StudentDetails'
-import { getStudents, getStudentDetails } from '../GetStudents'
+import { getStudentDetails } from '../GetStudents'
 import { addStudent } from '../addStudents'
 import { removeStudent } from '../removeStudent'
 
@@ -20,19 +20,6 @@ interface StudentsListProps {
     groupName?: string;
     isGroupName: Boolean;    
     refreshAll: () => void
-}
-
-const createId = async () => {
-    let id:string | number = '';
-    /*let chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
-    for (let i = 0; i < 2; i++) {
-        id += chars.charAt(Math.floor(Math.random() * chars.length));
-    }*/    
-    let idArray: Array<string | number> = []
-    const array: Student [] = await getStudents()
-    array.map((item:Student) => idArray.push(item.id));
-    id = +idArray[idArray.length-1] + 1;        
-    return id    
 }
 
 export const emptyStudent: Student = {
@@ -99,8 +86,7 @@ const StudentsList: React.FC<StudentsListProps> = props => {
         } else {
             setStudentDialog(false);           
             setNoEdit(true);
-            if (!studentData.id) {
-                studentData.id = await createId();            
+            if (!studentData.id) {          
                 addStudent(studentData);                
                 toast.current?.show({ severity: 'success', summary: 'Successful', detail: `Student ${studentData.firstName} id: ${studentData.id} added`, life: 3000 }); 
             } else {
@@ -119,21 +105,26 @@ const StudentsList: React.FC<StudentsListProps> = props => {
         setDeleteStudentsDialog(false);
     }   
     
-    const editStudent = async (student: Student) => {  
-        let _currentStudent = await getStudentDetails(student.id)
-        setCurrentStudent({..._currentStudent});        
+    const editStudent = async (student: Student) => { 
+        let _currentStudent: Student
+        if (student.id) {
+            _currentStudent = await getStudentDetails(student.id)
+            setCurrentStudent({..._currentStudent}); 
+        }       
         setStudentDialog(true);
     }
     
     const confirmDeleteStudent = (student: Student) => {
-        removeStudent(student.id)
-        setDeleteStudentDialog(true);
+        if (student.id) {
+            removeStudent(student.id)
+            setDeleteStudentDialog(true);
+        }
     }
   
     const deleteStudent = () => {
         let _students : Student []
         if (Array.isArray(props.students)) {
-            _students = props.students.filter((val: { id: string | number; }) => val.id !== student.id);
+            _students = props.students.filter((value) => value.id !== student.id);
             setStudentsList(_students); 
         setDeleteStudentDialog(false);
         setStudent(emptyStudent);

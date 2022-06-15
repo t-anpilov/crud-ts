@@ -12,7 +12,7 @@ import './app.css'
 
  
 export interface Student {
-    id: string | number;
+    id?: string | number;
     firstName: string;
     lastName: string;
     middleName: string;
