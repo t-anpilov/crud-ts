@@ -26,7 +26,7 @@ export interface Student {
 }
 
 export type Group = {
-    id: string | number,
+    id?: string | number,
     groupDescription: string,
     members?: Student[]
 }
@@ -39,15 +39,16 @@ const App: React.FC = () => {
     const [groupsData, setGroupsData] = useState<Group[]>([]);
     const [currentGroupName, setCurrentGroupName] = useState<string>();
     const [isGroupSelected, setIsGroupSelected] = useState<Boolean>(false);
-    const [updateList, setUpdateList] = useState<Boolean>(false);
+    const [updateGroupList, setUpdateGroupList] = useState<Boolean>(false);
+    const [updateStudentsList, setUpdateStudentsList] = useState<Boolean>(false);
     
     useEffect(() => {
         getGroups().then(data => setGroupsData(data));
-    }, [updateList])
+    }, [updateGroupList])
 
     useEffect(() => {
         getStudents().then(data => setStudentsData(data));
-    }, []);
+    }, [updateStudentsList]);
 
     const studentsListHandler = (e: DataTableSelectParams) => {
         
@@ -61,20 +62,14 @@ const App: React.FC = () => {
     }
 
     const studentsAllListHandler = () => {        
-        getStudents().then(data => setStudentsData(data))
+        setUpdateStudentsList(!updateStudentsList)
+        console.log('lets update student list')
         setIsGroupSelected(false)
-        setCurrentGroupName('')
-    }
+        setCurrentGroupName('')        
+    }    
 
-    //const currentPage = window.location
-
-    
-
-    const refreshAllHandler = () => {        
-        //currentPage.reload()
-        console.log('start ' + updateList)
-        setUpdateList(!updateList)
-        console.log('finish ' + updateList)
+    const refreshGroupListHandler = () => {
+        setUpdateGroupList(!updateGroupList)
     }
 
     return (
@@ -85,12 +80,12 @@ const App: React.FC = () => {
                 showMembersAtList={studentsListHandler}
                 showAllMembersAtList={studentsAllListHandler}
                 someGroupSelected = {isGroupSelected}
-                refreshAll = {refreshAllHandler}/>
+                refreshGroupsList = {refreshGroupListHandler}/>
             <StudentsList 
                 students={studentsData} 
                 groupName={currentGroupName} 
                 isGroupName = {isGroupSelected}
-                refreshAll = {studentsAllListHandler}/>
+                showAllStudents = {studentsAllListHandler}/>
             
         </div>
     );

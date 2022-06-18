@@ -19,7 +19,7 @@ interface StudentsListProps {
     students: Student [];
     groupName?: string;
     isGroupName: Boolean;    
-    refreshAll: () => void
+    showAllStudents: () => void
 }
 
 export const emptyStudent: Student = {
@@ -93,7 +93,7 @@ const StudentsList: React.FC<StudentsListProps> = props => {
                 addStudent(studentData);                
                 toast.current?.show({ severity: 'success', summary: 'Successful', detail: `Student ${studentData.firstName} updated`, life: 3000 });
             }
-            props.refreshAll()
+            props.showAllStudents()
         }
     }    
 

@@ -8,9 +8,9 @@ import 'primereact/resources/themes/saga-blue/theme.css';
 import 'primereact/resources/primereact.min.css';
 import 'primeicons/primeicons.css';
 import 'primeflex/primeflex.css';
-import { Group } from '../App'
+import { Group, Student } from '../App'
 import GroupDetails from './GroupDetails'
-import { getGroups, getGroupsMembers } from '../getGroups'
+import { getGroupsMembers } from '../getGroups'
 import { addGroup } from '../addGroup'
 
 interface GroupsListProps {
@@ -18,23 +18,12 @@ interface GroupsListProps {
     showMembersAtList: (e: DataTableSelectParams) => void;
     showAllMembersAtList: () => void;
     someGroupSelected: Boolean;    
-    refreshAll: () => void
-}
-
-const createId = async () => {
-    let id:string | number = '';      
-    let idArray: Array<string | number> = []
-    const array: Group [] = await getGroups()
-    array.map((item:Group) => idArray.push(item.id));
-    id = +idArray[idArray.length-1] + 1;        
-    return id    
+    refreshGroupsList: () => void
 }
 
 const GroupsList: React.FC<GroupsListProps> = props => {
 
     const emptyGroup = {id: '', groupDescription: ''}
-
-    
     const [groupDialog, setGroupDialog] = useState(false);
     const [globalFilter, setGlobalFilter] = useState<string>();
     const [selectedGroup, setSelectedGroup] = useState<Group>(emptyGroup);
@@ -74,25 +63,28 @@ const GroupsList: React.FC<GroupsListProps> = props => {
         } else {
             setGroupDialog(false);             
             setNoEdit(true);
-            if (!groupData.id) {
-                groupData.id = await createId();            
+            if (!groupData.id) {                           
                 addGroup(groupData);
                 toast.current?.show({ severity: 'success', summary: 'Successful', detail: `Group ${groupData.groupDescription} added`, life: 3000 });
             } else {
                 addGroup(groupData);
                 toast.current?.show({ severity: 'success', summary: 'Successful', detail: `Group ${groupData.groupDescription} updated`, life: 3000 })  
             }
-            props.refreshAll()
+            props.refreshGroupsList()
         }       
     } 
 
     const editGroup = async (group: Group) => {  
         const _currentGroup = {...group};
         setCurrentGroup(_currentGroup); 
-        const listOfStudents = await getGroupsMembers(group.id);
-        console.log(listOfStudents);
-        setStudentsNumber(listOfStudents.length);
-        setGroupDialog(true);
+        let listOfStudents: Student []
+        if (group.id) {
+            listOfStudents = await getGroupsMembers(group.id);
+            console.log(listOfStudents);
+            setStudentsNumber(listOfStudents.length);
+            setGroupDialog(true);
+        }       
+        
     }
 
 
@@ -148,10 +140,8 @@ const GroupsList: React.FC<GroupsListProps> = props => {
                 hideDialog={hideDialogHandler}
                 hideAndSaveDialog={hideAndSaveDialogHandler} 
                 allowEdit={allowEditHandler}
-                numberOfMembers={studentsNumber}/>
-                
-            }
-            
+                numberOfMembers={studentsNumber}/>                
+            }            
         </div>
     )
 }
