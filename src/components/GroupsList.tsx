@@ -17,8 +17,7 @@ interface GroupsListProps {
     groups: Group [];
     showMembersAtList: (e: DataTableSelectParams) => void;
     showAllMembersAtList: () => void;
-    someGroupSelected: Boolean;    
-    refreshGroupsList: () => void
+    someGroupSelected: Boolean; 
 }
 
 const GroupsList: React.FC<GroupsListProps> = props => {
@@ -58,6 +57,7 @@ const GroupsList: React.FC<GroupsListProps> = props => {
     }
 
     const hideAndSaveDialogHandler = async (groupData: Group) => {
+        console.log(groupData)
         if (!checkOfGroup(groupData)) {
             toast.current?.show({ severity: 'warn', summary: 'Warning', detail: 'Please fill all required fields', life: 3000 }); 
         } else {
@@ -67,10 +67,10 @@ const GroupsList: React.FC<GroupsListProps> = props => {
                 addGroup(groupData);
                 toast.current?.show({ severity: 'success', summary: 'Successful', detail: `Group ${groupData.groupDescription} added`, life: 3000 });
             } else {
-                addGroup(groupData);
+                //addGroup(groupData); -- need to clarify POST request for it
+                console.log('NOT ready')
                 toast.current?.show({ severity: 'success', summary: 'Successful', detail: `Group ${groupData.groupDescription} updated`, life: 3000 })  
             }
-            props.refreshGroupsList()
         }       
     } 
 
@@ -79,12 +79,10 @@ const GroupsList: React.FC<GroupsListProps> = props => {
         setCurrentGroup(_currentGroup); 
         let listOfStudents: Student []
         if (group.id) {
-            listOfStudents = await getGroupsMembers(group.id);
-            console.log(listOfStudents);
+            listOfStudents = await getGroupsMembers(group.id);            
             setStudentsNumber(listOfStudents.length);
             setGroupDialog(true);
-        }       
-        
+        }  
     }
 
 

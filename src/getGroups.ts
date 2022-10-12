@@ -3,7 +3,7 @@ function getGroups() {
         method: 'GET',
         mode: 'cors'})    
     .then(res => res.json())
-    .then(d =>   d.content)
+    .then(d => d.content)
 }
 
 function getGroupsMembers(id: string | number) {
