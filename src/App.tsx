@@ -64,8 +64,12 @@ const App: React.FC = () => {
         setCurrentGroupName('')        
     }  
     
-    const updateListHandler = () => {
+    const updateStudentsListHandler = () => {
         getStudents().then(data => setStudentsData(data))
+    };
+
+    const updateGroupsListHandler = () => {
+        getGroups().then(data => setGroupsData(data))
     };
 
     return (
@@ -76,12 +80,13 @@ const App: React.FC = () => {
                 showMembersAtList={studentsListHandler}
                 showAllMembersAtList={studentsAllListHandler}
                 someGroupSelected = {isGroupSelected}
+                updateList = {updateGroupsListHandler}
             />
             <StudentsList 
                 students={studentsData} 
                 groupName={currentGroupName} 
                 isGroupName = {isGroupSelected}
-                updateList = {updateListHandler}
+                updateList = {updateStudentsListHandler}
             />
             
         </div>

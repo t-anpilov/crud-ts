@@ -18,6 +18,7 @@ interface GroupsListProps {
     showMembersAtList: (e: DataTableSelectParams) => void;
     showAllMembersAtList: () => void;
     someGroupSelected: Boolean; 
+    updateList: () => void
 }
 
 const GroupsList: React.FC<GroupsListProps> = props => {
@@ -64,13 +65,14 @@ const GroupsList: React.FC<GroupsListProps> = props => {
             setGroupDialog(false);             
             setNoEdit(true);
             if (!groupData.id) {                           
-                addGroup(groupData);
+                await addGroup(groupData);
                 toast.current?.show({ severity: 'success', summary: 'Successful', detail: `Group ${groupData.groupDescription} added`, life: 3000 });
             } else {
-                //addGroup(groupData); -- need to clarify POST request for it
+                //await addGroup(groupData); -- need to clarify POST request for it
                 console.log('NOT ready')
                 toast.current?.show({ severity: 'success', summary: 'Successful', detail: `Group ${groupData.groupDescription} updated`, life: 3000 })  
             }
+            props.updateList()
         }       
     } 
 
