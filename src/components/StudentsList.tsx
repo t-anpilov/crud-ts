@@ -11,8 +11,8 @@ import 'primeicons/primeicons.css';
 import 'primeflex/primeflex.css';
 import { Student } from '../App'  
 import StudentDetails from './StudentDetails'
-import { getStudentDetails } from '../GetStudents'
-import { addStudent } from '../addStudents'
+import { getStudentDetails } from '../models/GetStudents'
+import { addStudent } from '../models/addStudents'
 import { removeStudent } from '../removeStudent'
 
 interface StudentsListProps {
@@ -198,6 +198,7 @@ const StudentsList: React.FC<StudentsListProps> = props => {
                 <InputText type="search" onInput={(e: FormEvent<HTMLInputElement>) => setGlobalFilter(e.currentTarget.value)} placeholder="Search..." className="w-full lg:w-auto" />
             </span>
             <div className="mt-3 md:mt-0 flex justify-content-end">
+                <Button icon="pi pi-user" className="mr-2 p-button-rounded" onClick={()=>{}} tooltip="Add to the groups" tooltipOptions={{position: 'bottom'}} />    
                 <Button icon="pi pi-plus" className="mr-2 p-button-rounded" onClick={openNew} tooltip="New" tooltipOptions={{position: 'bottom'}} />
                 <Button icon="pi pi-trash" className="p-button-danger mr-2 p-button-rounded" onClick={confirmDeleteSelected} disabled={!selectedStudents || !selectedStudents.length} tooltip="Delete" tooltipOptions={{position: 'bottom'}} />
                 

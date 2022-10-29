@@ -1,4 +1,4 @@
-import { Student } from './App'  
+import { Student } from '../App'  
 
 function addStudent(newData: Student) {
     const jsonData = JSON.stringify(newData)

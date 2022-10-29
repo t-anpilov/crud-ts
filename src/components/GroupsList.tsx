@@ -10,8 +10,8 @@ import 'primeicons/primeicons.css';
 import 'primeflex/primeflex.css';
 import { Group, Student } from '../App'
 import GroupDetails from './GroupDetails'
-import { getGroupsMembers } from '../getGroups'
-import { addGroup } from '../addGroup'
+import { getGroupsMembers } from '../models/getGroups'
+import { addGroup } from '../models/addGroup'
 
 interface GroupsListProps {
     groups: Group [];

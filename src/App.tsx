@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { DataTableSelectParams } from 'primereact/datatable';
-import { getStudents } from './GetStudents';
-import { getGroups, getGroupsMembers } from './getGroups'
+import { getStudents } from './models/GetStudents';
+import { getGroups, getGroupsMembers } from './models/getGroups'
 import 'primereact/resources/themes/saga-blue/theme.css';
 import 'primereact/resources/primereact.min.css';
 import 'primeicons/primeicons.css';
@@ -59,7 +59,8 @@ const App: React.FC = () => {
         
     }
 
-    const studentsAllListHandler = () => { 
+    const studentsAllListHandler = () => {
+        getStudents().then(data => setStudentsData(data)) 
         setIsGroupSelected(false)
         setCurrentGroupName('')        
     }  

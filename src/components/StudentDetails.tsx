@@ -11,7 +11,9 @@ import 'primereact/resources/themes/saga-blue/theme.css';
 import 'primereact/resources/primereact.min.css';
 import 'primeicons/primeicons.css';
 import 'primeflex/primeflex.css';
-import { Student, Shifts } from '../App' 
+import { Student, Shifts } from '../App' ;
+import AddToGroupDialog from './AddToGroupDialog'
+
 
 type StudentDetailsProps = { 
     isVisible: boolean;
@@ -24,7 +26,8 @@ type StudentDetailsProps = {
 
 const StudentDetails: React.FC<StudentDetailsProps> = props => {
       
-    const [student, setStudent] = useState<Student>(props.studentDetailedData);    
+    const [student, setStudent] = useState<Student>(props.studentDetailedData);
+    const [addToGroup, setAddToGroup] = useState(false);    
     
     
     useEffect(() => {
@@ -224,7 +227,20 @@ const StudentDetails: React.FC<StudentDetailsProps> = props => {
                             placeholder='Select a shift' />
                     </div> 
                 </div>
-                {groupsList}                
+                {groupsList}
+                <div>
+                    <span>Add to the group </span>
+                    <Button 
+                        icon="pi pi-plus" 
+                        className="p-button p-button-success mr-2" 
+                        onClick={() => setAddToGroup(true)}
+                    />
+                </div>   
+                <AddToGroupDialog
+                    isVisible = {addToGroup}
+                    hideDialog = {() => setAddToGroup(false)}
+                    student = {student}
+                />                
                 
             </Dialog>
     );

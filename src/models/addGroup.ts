@@ -1,4 +1,4 @@
-import { Group } from './App'  
+import { Group } from '../App'  
 
 function addGroup(newData: Group) {
     const jsonData = JSON.stringify(newData)
