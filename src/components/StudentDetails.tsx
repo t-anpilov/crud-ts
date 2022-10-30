@@ -13,6 +13,7 @@ import 'primeicons/primeicons.css';
 import 'primeflex/primeflex.css';
 import { Student, Shifts } from '../App' ;
 import AddToGroupDialog from './AddToGroupDialog'
+import { addStudentsTotheGroup } from '../models/addToTheGroup'
 
 
 type StudentDetailsProps = { 
@@ -112,6 +113,15 @@ const StudentDetails: React.FC<StudentDetailsProps> = props => {
         _student.insurance = !!val 
         setStudent(_student);
     } 
+
+    const addToGroupHandler = async (studentsID: Array<string | number>, groupID: string) => {
+        if (groupID) {
+            await addStudentsTotheGroup(studentsID, groupID);
+        } else {
+            alert('No more avaliable groups for this student')
+        }        
+        setAddToGroup(false)
+    }
 
     const studentDialogFooter = (
         <React.Fragment>            
@@ -238,8 +248,8 @@ const StudentDetails: React.FC<StudentDetailsProps> = props => {
                 </div>   
                 <AddToGroupDialog
                     isVisible = {addToGroup}
-                    hideDialog = {() => setAddToGroup(false)}
                     student = {student}
+                    hideDialog = {addToGroupHandler}                    
                 />                
                 
             </Dialog>

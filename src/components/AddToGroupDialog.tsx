@@ -10,18 +10,19 @@ import 'primeicons/primeicons.css';
 import 'primeflex/primeflex.css';
 import { Student, Group } from '../App'
 import { getGroups } from '../models/getGroups' 
-import { addStudentsTotheGroup } from '../models/addToTheGroup'
+
 
 type AddToGroupProps = { 
     isVisible: boolean;
-    hideDialog: () => void;
+    hideDialog: (studentsID: Array<string | number>, groupID: string) => void;
     student: Student
 }
 
 const AddToGroupDialog: React.FC<AddToGroupProps> = props => {
 
-    const [groupsList, setGroupsList] = useState<Group[]>([])
-    const [selectedGroupID, setSelectedGroupID] = useState('') 
+    const [groupsList, setGroupsList] = useState<Group[]>([]);
+    const [selectedGroupID, setSelectedGroupID] = useState('');
+    const [studentsList, setStudentsList] = useState<Array<string | number>>([]);
     
     useEffect(() => {
         getGroups().then(data => setGroupsList(data));
@@ -30,9 +31,10 @@ const AddToGroupDialog: React.FC<AddToGroupProps> = props => {
     const onGroupSelect = (e: DropdownChangeParams) => {        
         let studentID: Array<string | number> = []
         if(props.student.id) studentID.push(props.student.id)
+        setStudentsList(studentID)
         const groupID = e.target.value.id
-        console.log(groupID)
-        addStudentsTotheGroup(studentID, groupID)
+        setSelectedGroupID(groupID)
+        //addStudentsTotheGroup(studentID, groupID)
     }
 
     const filterGroup = (arr1: Group[], val: string | number) => {
@@ -65,7 +67,7 @@ const AddToGroupDialog: React.FC<AddToGroupProps> = props => {
             style={{width: '40vw'}} 
             header="Add Student To The Group" 
             modal className="p-fluid" 
-            onHide={props.hideDialog}
+            onHide={() => props.hideDialog(studentsList, selectedGroupID)}
         >
             <div className="field col">
                 <label htmlFor="shift" className="titles">Select a group</label>
