@@ -253,7 +253,8 @@ const StudentsList: React.FC<StudentsListProps> = props => {
                 noEditMode={noEdit} 
                 hideDialog={hideDialogHandler}
                 hideAndSaveDialog={hideAndSaveDialogHandler} 
-                allowEdit={allowEditHandler}/>
+                allowEdit={allowEditHandler}
+            />
                 
             }            
             

@@ -14,27 +14,32 @@ import { getGroups } from '../models/getGroups'
 
 type AddToGroupProps = { 
     isVisible: boolean;
-    hideDialog: (studentsID: Array<string | number>, groupID: string) => void;
-    student: Student
+    hideDialog: (studentID: string | number, groupID?: string, groupName?: string) => void;
+    student: Student;
 }
 
 const AddToGroupDialog: React.FC<AddToGroupProps> = props => {
 
+    const emptyGroup: Group = {groupDescription: ''}
     const [groupsList, setGroupsList] = useState<Group[]>([]);
-    const [selectedGroupID, setSelectedGroupID] = useState('');
-    const [studentsList, setStudentsList] = useState<Array<string | number>>([]);
+    const [groupOptions, setGroupOptions] = useState<Group[]>([]);
+    const [selectedGroup, setSelectedGroup] = useState<Group>(emptyGroup);
+    const [studentID, setStudentID] = useState<string | number>('');
     
     useEffect(() => {
         getGroups().then(data => setGroupsList(data));
     }, [])
 
-    const onGroupSelect = (e: DropdownChangeParams) => {        
-        let studentID: Array<string | number> = []
-        if(props.student.id) studentID.push(props.student.id)
-        setStudentsList(studentID)
-        const groupID = e.target.value.id
-        setSelectedGroupID(groupID)
-        //addStudentsTotheGroup(studentID, groupID)
+    useEffect(() => {
+        if(props.student.id) setStudentID(props.student.id);
+    }, [])
+
+    const onGroupSelect = (e: DropdownChangeParams) => { 
+        const value: Group = e.target && e.target.value;
+        let _group = {...selectedGroup};        
+        _group.id = value.id;
+        _group.groupDescription = value.groupDescription;    
+        setSelectedGroup(_group);  
     }
 
     const filterGroup = (arr1: Group[], val: string | number) => {
@@ -44,7 +49,6 @@ const AddToGroupDialog: React.FC<AddToGroupProps> = props => {
 
     const getAvaliableGroups = () => {
         let avaliableGroups : Group[] = []
-        let options: Object[] = []
          
         if (!props.student.groups) {
             avaliableGroups = [...groupsList];
@@ -54,11 +58,9 @@ const AddToGroupDialog: React.FC<AddToGroupProps> = props => {
                     avaliableGroups.push(group);
                 }
             });
-        };
-        avaliableGroups.forEach(group => options.push({name: group.groupDescription, id: group.id}))
-        return options
+        };        
+        setGroupOptions([...avaliableGroups]);
     };
-    
 
     return (
         <Dialog
@@ -67,16 +69,18 @@ const AddToGroupDialog: React.FC<AddToGroupProps> = props => {
             style={{width: '40vw'}} 
             header="Add Student To The Group" 
             modal className="p-fluid" 
-            onHide={() => props.hideDialog(studentsList, selectedGroupID)}
+            onHide={() => props.hideDialog(studentID, selectedGroup.id?.toString(), selectedGroup.groupDescription)}
+            onShow={() => getAvaliableGroups()}
         >
             <div className="field col">
                 <label htmlFor="shift" className="titles">Select a group</label>
                     <Dropdown 
                         id="groupSelect"  
-                        optionLabel="name"
-                        options={getAvaliableGroups()}
+                        optionLabel="groupDescription"
+                        options={groupOptions}
+                        value={selectedGroup}
                         onChange={e => onGroupSelect(e)}
-                        placeholder='Select a shift' />
+                        placeholder='Select a group' />
             </div> 
         </Dialog>
     )

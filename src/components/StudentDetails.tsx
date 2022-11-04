@@ -1,4 +1,4 @@
-import React, { useState, ChangeEvent, useEffect } from 'react';
+import React, { useState, useRef, ChangeEvent, useEffect } from 'react';
 import { Calendar, CalendarChangeParams } from 'primereact/calendar'
 import { RadioButton, RadioButtonChangeParams  } from 'primereact/radiobutton'
 import { InputNumber, InputNumberChangeParams } from 'primereact/inputnumber'
@@ -7,6 +7,7 @@ import { Button } from 'primereact/button';
 import { Dialog } from 'primereact/dialog';
 import { InputText } from 'primereact/inputtext';
 import { classNames } from 'primereact/utils'; 
+import { Toast } from 'primereact/toast';
 import 'primereact/resources/themes/saga-blue/theme.css';
 import 'primereact/resources/primereact.min.css';
 import 'primeicons/primeicons.css';
@@ -28,12 +29,22 @@ type StudentDetailsProps = {
 const StudentDetails: React.FC<StudentDetailsProps> = props => {
       
     const [student, setStudent] = useState<Student>(props.studentDetailedData);
-    const [addToGroup, setAddToGroup] = useState(false);    
+    const [addToGroup, setAddToGroup] = useState(false);   
+    const [currentGroups, setCurrentGroups] = useState<String[]>([]);
+    const toast = useRef<Toast>(null);
     
     
     useEffect(() => {
        setStudent(props.studentDetailedData);
     }, [props.studentDetailedData])
+
+    useEffect(() => {
+        const groupsList : String[] = [];
+        if (props.studentDetailedData.groups) {
+            props.studentDetailedData.groups.map(group => groupsList.push(group.groupDescription));
+            setCurrentGroups(groupsList);
+        }        
+     }, [props.studentDetailedData.groups])
    
 
     /*const findIndexById = (id: string | number) => {
@@ -114,13 +125,22 @@ const StudentDetails: React.FC<StudentDetailsProps> = props => {
         setStudent(_student);
     } 
 
-    const addToGroupHandler = async (studentsID: Array<string | number>, groupID: string) => {
-        if (groupID) {
-            await addStudentsTotheGroup(studentsID, groupID);
-        } else {
+    const addToGroupHandler = async (studentID: string | number, groupID?: string, groupName?: string) => {
+        if (typeof groupID !== 'undefined' && groupID !== null) {
+            let idArray = []
+            idArray.push(studentID)          
+            await addStudentsTotheGroup(idArray, groupID);
+            setAddToGroup(false);            
+            toast.current?.show({ 
+                severity: 'success', 
+                summary: 'Successful', 
+                detail: `Student ${student.firstName} ${student.lastName} added to the group '${groupName}'`, 
+                life: 3000 
+            }); 
+        } else if (!groupID) {
             alert('No more avaliable groups for this student')
-        }        
-        setAddToGroup(false)
+            setAddToGroup(false)
+        }  
     }
 
     const studentDialogFooter = (
@@ -133,12 +153,12 @@ const StudentDetails: React.FC<StudentDetailsProps> = props => {
 
     const groupsList = (
         <React.Fragment>
-            {student.groups && student.groups.length>0 && <div className='col'>
+            {currentGroups && currentGroups.length>0 && <div className='col'>
                 <label className='titles'> List of groups: </label>
                 <ul className='col-12'>
-                    { student.groups && student.groups.map( group => {
-                        return  <li title = {`id:${group.id}, ${group.groupDescription}`} key={group.id}>
-                            {group.groupDescription}
+                    { currentGroups.map( groupName => {
+                        return  <li  key={Math.random().toString()}>
+                            {groupName}
                         </li>
                     }) }    
                 </ul>
@@ -154,7 +174,9 @@ const StudentDetails: React.FC<StudentDetailsProps> = props => {
             header="Student Profile" 
             modal className="p-fluid" 
             footer={studentDialogFooter} 
-            onHide={props.hideDialog}>
+            onHide={props.hideDialog}
+            >
+                <Toast ref={toast} />
                 {student.photoId && <img 
                     src={`demo/images/${student.photoId}`} 
                     alt={student.photoId} 
